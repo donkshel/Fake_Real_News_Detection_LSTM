@@ -15,9 +15,19 @@ from datetime import datetime, timezone
 def get_db():
     """Return a Firestore client, initialising Firebase once per session."""
     if not firebase_admin._apps:
-        key_dict = dict(st.secrets["firebase"])
-        # Streamlit stores the private key with literal \n — convert to real newlines
-        key_dict["private_key"] = key_dict["private_key"].replace("\\n", "\n")
+        # Build the dict manually — ensures all fields are plain strings
+        key_dict = {
+            "type":                        st.secrets["firebase"]["type"],
+            "project_id":                  st.secrets["firebase"]["project_id"],
+            "private_key_id":              st.secrets["firebase"]["private_key_id"],
+            "private_key":                 st.secrets["firebase"]["private_key"].replace("\\n", "\n"),
+            "client_email":                st.secrets["firebase"]["client_email"],
+            "client_id":                   st.secrets["firebase"]["client_id"],
+            "auth_uri":                    st.secrets["firebase"]["auth_uri"],
+            "token_uri":                   st.secrets["firebase"]["token_uri"],
+            "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+            "client_x509_cert_url":        f"https://www.googleapis.com/robot/v1/metadata/x509/{st.secrets['firebase']['client_email']}",
+        }
         cred = credentials.Certificate(key_dict)
         firebase_admin.initialize_app(cred)
     return firestore.client()
@@ -142,15 +152,11 @@ def save_classification(user_id, input_text: str, result: dict):
 
 def get_user_history(user_id, limit: int = 50):
     db = get_db()
-    docs = (
-        db.collection("history")
-        .where("user_id", "==", str(user_id))
-        .where("deleted_by_user", "==", False)
-        .order_by("classified_at", direction=firestore.Query.DESCENDING)
-        .limit(limit)
-        .get()
-    )
-    return _docs_to_dicts(docs)
+    docs = db.collection("history").where("user_id", "==", str(user_id)).get()
+    rows = _docs_to_dicts(docs)
+    rows = [r for r in rows if not r.get("deleted_by_user", False)]
+    rows.sort(key=lambda x: x.get("classified_at", ""), reverse=True)
+    return rows[:limit]
 
 
 def delete_history_entry(entry_id, user_id):
@@ -193,14 +199,9 @@ def create_message(user_id, subject: str, body: str) -> bool:
 
 def get_messages_by_user(user_id):
     db = get_db()
-    docs = (
-        db.collection("messages")
-        .where("user_id", "==", str(user_id))
-        .order_by("created_at", direction=firestore.Query.DESCENDING)
-        .get()
-    )
+    docs = db.collection("messages").where("user_id", "==", str(user_id)).get()
     rows = _docs_to_dicts(docs)
-    # Attach username to each row (authentication.py expects m.username)
+    rows.sort(key=lambda x: x.get("created_at", ""), reverse=True)
     user = get_user_by_id(user_id)
     username = user["username"] if user else str(user_id)
     for row in rows:
@@ -210,13 +211,9 @@ def get_messages_by_user(user_id):
 
 def get_all_messages():
     db = get_db()
-    docs = (
-        db.collection("messages")
-        .order_by("created_at", direction=firestore.Query.DESCENDING)
-        .get()
-    )
+    docs = db.collection("messages").get()
     rows = _docs_to_dicts(docs)
-    # Attach username to each message row
+    rows.sort(key=lambda x: x.get("created_at", ""), reverse=True)
     for row in rows:
         user = get_user_by_id(row["user_id"])
         row["username"] = user["username"] if user else row["user_id"]
@@ -225,13 +222,9 @@ def get_all_messages():
 
 def get_replies_for_message(message_id):
     db = get_db()
-    docs = (
-        db.collection("replies")
-        .where("message_id", "==", str(message_id))
-        .order_by("created_at")
-        .get()
-    )
+    docs = db.collection("replies").where("message_id", "==", str(message_id)).get()
     rows = _docs_to_dicts(docs)
+    rows.sort(key=lambda x: x.get("created_at", ""))
     for row in rows:
         admin = get_user_by_id(row["admin_id"])
         row["admin_name"] = admin["username"] if admin else row["admin_id"]
