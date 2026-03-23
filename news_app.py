@@ -295,10 +295,10 @@ div[data-testid="stTabs"] [data-baseweb="tab-border"] { display: none !important
 # ─────────────────────────────────────────────
 @st.cache_resource
 def load_resources():
-    if os.path.exists('fake_true_news_lstm_model.keras'):
-        model = load_model('fake_true_news_lstm_model.keras')
-    elif os.path.exists('fake_true_news_lstm_model.h5'):
-        model = load_model('fake_true_news_lstm_model.h5')
+    if os.path.exists('lstm_model.keras'):
+        model = load_model('lstm_model.keras')
+    elif os.path.exists('lstm_model.h5'):
+        model = load_model('lstm_model.h5')
     else:
         st.error("Model file not found.")
         st.stop()
