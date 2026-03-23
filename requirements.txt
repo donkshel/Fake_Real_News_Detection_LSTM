@@ -1,5 +1,6 @@
 tensorflow-cpu==2.16.2
 streamlit
+firebase-admin
 numpy
 pandas
 nltk
