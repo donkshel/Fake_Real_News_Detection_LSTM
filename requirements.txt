@@ -6,4 +6,3 @@ nltk
 scikit-learn
 plotly
 wordcloud
-keras==2.16.0
