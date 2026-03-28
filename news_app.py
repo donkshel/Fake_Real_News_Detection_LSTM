@@ -82,7 +82,6 @@ with st.sidebar:
                 "🔍  Detect",
                 "📊  Model Evaluation",
                 "📁  Dataset & Training",
-                "🧩  Proposal Details",
                 "🕒  History",
                 support_label,
             ],
@@ -626,42 +625,30 @@ elif selected_page == "📊  Model Evaluation":
 # ══════════════════════════════════════════════
 elif selected_page == "📁  Dataset & Training":
     st.markdown('<p class="section-label">Dataset & Training Insights</p>', unsafe_allow_html=True)
-    st.markdown("The model was trained on the Kaggle Fake and True News Dataset (~44,000 articles).<br><br>Key techniques: tokenisation, padding to 531 tokens, Bidirectional LSTM, EarlyStopping, ReduceLROnPlateau.", unsafe_allow_html=True)
-    st.divider()
-    images = [("Subject_sample.png","Subject Distribution"),("Confusion_matrix.png","Confusion Matrix"),("Class_report.png","Classification Report"),("Training_Validation_Loss.png","Training vs Validation Loss"),("Training_Validation_Accuracy.png","Training vs Validation Accuracy"),("newplot.png","Sequence Length Distribution")]
-    img_cols = st.columns(3) + st.columns(3)
-    for col, (fname, caption) in zip(img_cols, images):
-        with col:
-            if os.path.exists(fname):
-                st.image(fname, caption=caption, use_container_width=True)
-            else:
-                st.markdown(f'<div class="stat-box" style="padding:2rem;color:#aaa;font-size:0.8rem">{caption}<br><span style="font-size:0.7rem">({fname} not found)</span></div>', unsafe_allow_html=True)
+    st.markdown("""<h5>Dataset</h5>
+                The model was trained on the following datasets:<br>  
+                > Kaggle Fake and True News Dataset (True.csv and Fake.csv) (~44,000 articles).<br>
+                > kenyan news(news.csv and kenya.csv) which was scraped from news sources including the standard and nation<br><br>
+                <h5>Preprocessing & Model</h5>
+                The dataset was cleaned and only required columns were retained that is title, text and label.<br>
+                Key techniques: text preprocessing, tokenisation, padding to 531 tokens, Bidirectional LSTM, EarlyStopping, ReduceLROnPlateau.<br>
+                80/20 stratified train-test split was used to evaluate performance on unseen data.<br>
+                <h5>Evaluation</h5>
+                The model achieved strong performance on the test set, with an AUC-ROC of 0.9996 and an accuracy of 0.9918 at the default threshold of 0.5.<br>
+                Detailed evaluation metrics, curves, and confusion matrix are available in the Model Evaluation section.
+                <h5>Additional Notes</h5>
+                - The model is more likely to misclassify short articles or headlines, which may lack sufficient context for accurate classification.<br>
+                - The dataset contains a mix of news topics and writing styles, which can influence model performance on certain types of articles.<br>
+                - The model may classify satire or opinion pieces as "UNCERTAIN" due to mixed signals in the text. Always verify uncertain results with trusted sources.<br>
+                - The model is not in real time and may classify real news as fake if it contains sensational language or lacks credible context. Use the authenticity score as a guide, not an absolute verdict.<br>
+                """, unsafe_allow_html=True)
+    
     st.divider()
     st.markdown('<div class="insight-box"><b>Model Architecture:</b> Bidirectional LSTM (128+64 units), SpatialDropout1D, 128-dim Embedding, sigmoid output. Trained on 80/20 stratified split.</div>', unsafe_allow_html=True)
 
 
 # ══════════════════════════════════════════════
-# PAGE 4 — PROPOSAL DETAILS
-# ══════════════════════════════════════════════
-elif selected_page == "🧩  Proposal Details":
-    st.markdown('<p class="section-label">Project Proposal & Deliverables</p>', unsafe_allow_html=True)
-    st.markdown("<h3>Problem Statement</h3>", unsafe_allow_html=True)
-    st.markdown("The relative ease with which users create content has made credibility maintenance a challenge. Traditional manual fact-checking cannot keep pace with modern data velocity. This project deploys an LSTM-based model to filter news articles as real or fake.", unsafe_allow_html=True)
-    st.markdown("<h3>Project Objectives</h3>", unsafe_allow_html=True)
-    st.markdown("""
-                1. Develop a robust LSTM-based predictive model for detecting real and fake news.<br><br>
-                2. Preprocess data using tokenization and stop word removal.<br><br>
-                3. Evaluate using accuracy, precision, recall and F1-score.<br><br>
-                4. Deploy in a user-friendly web application.
-                """, unsafe_allow_html=True)
-    st.markdown("<h3>Scope and Limitations</h3>", unsafe_allow_html=True)
-    st.markdown("""Performance depends on training data quality. The model may struggle with satire, nuanced language, or emerging topics not in the training set. <br>
-                This app is for educational purposes and should not be solely relied upon for critical decisions.
-                """, unsafe_allow_html=True)
-
-
-# ══════════════════════════════════════════════
-# PAGE 5 — HISTORY
+# PAGE 4 — HISTORY
 # ══════════════════════════════════════════════
 elif selected_page == "🕒  History":
     st.markdown('<p class="section-label">Classification history</p>', unsafe_allow_html=True)
@@ -679,6 +666,39 @@ elif selected_page == "🕒  History":
         valid_ids = {dict(r)["id"] for r in rows} if rows else set()
         st.session_state.hist_selected &= valid_ids
 
+        # ── Pre-sync checkboxes BEFORE computing n_sel ────────────
+        if rows:
+            hist_df_temp = pd.DataFrame([dict(r) for r in rows])
+            all_ids = set(hist_df_temp["id"].tolist())
+
+            current_select_all = st.session_state.get("hist_select_all", False)
+            prev_select_all    = st.session_state.get("hist_select_all_prev", False)
+
+            if current_select_all:
+                # Select All just ticked → force-select every row
+                st.session_state.hist_selected = all_ids.copy()
+                for rid in all_ids:
+                    st.session_state[f"hist_row_{rid}"] = True
+
+            elif not current_select_all and prev_select_all:
+                # Select All just UN-ticked → force-clear every row
+                st.session_state.hist_selected = set()
+                for rid in all_ids:
+                    st.session_state[f"hist_row_{rid}"] = False
+
+            else:
+                # Normal individual checkbox sync
+                for rid in all_ids:
+                    key = f"hist_row_{rid}"
+                    if key in st.session_state:
+                        if st.session_state[key]:
+                            st.session_state.hist_selected.add(rid)
+                        else:
+                            st.session_state.hist_selected.discard(rid)
+
+            # Remember current value for next rerun
+            st.session_state.hist_select_all_prev = current_select_all
+
         # ── Top action bar ────────────────────────────────────────
         col_info, col_del_sel, col_clear = st.columns([3, 1.4, 1.4])
         with col_info:
@@ -688,13 +708,21 @@ elif selected_page == "🕒  History":
             del_label = f"🗑  Delete Selected ({n_sel})" if n_sel else "🗑  Delete Selected"
             if st.button(del_label, use_container_width=True, disabled=(n_sel == 0)):
                 delete_selected_history(u['id'], list(st.session_state.hist_selected))
+                for rid in list(st.session_state.hist_selected):
+                    st.session_state.pop(f"hist_row_{rid}", None)
                 st.session_state.hist_selected = set()
+                st.session_state.pop("hist_select_all", None)
+                st.session_state.pop("hist_select_all_prev", None)
                 st.success(f"Deleted {n_sel} record(s).")
                 st.rerun()
         with col_clear:
             if st.button("🗑  Clear All History", use_container_width=True):
                 clear_user_history(u['id'])
+                for rid in valid_ids:
+                    st.session_state.pop(f"hist_row_{rid}", None)
                 st.session_state.hist_selected = set()
+                st.session_state.pop("hist_select_all", None)
+                st.session_state.pop("hist_select_all_prev", None)
                 st.success("History cleared.")
                 st.rerun()
 
@@ -707,26 +735,21 @@ elif selected_page == "🕒  History":
             hist_df["input_text"] = hist_df["input_text"].str[:80] + "…"
 
             # ── Select All checkbox ───────────────────────────────
-            all_ids   = set(hist_df["id"].tolist())
+            all_ids    = set(hist_df["id"].tolist())
             all_ticked = st.session_state.hist_selected == all_ids
-            select_all = st.checkbox(
+            st.checkbox(
                 "Select All",
                 value=all_ticked,
                 key="hist_select_all",
             )
-            if select_all:
-                st.session_state.hist_selected = all_ids.copy()
-            elif all_ticked and not select_all:
-                # User just un-ticked Select All → clear everything
-                st.session_state.hist_selected = set()
 
             st.markdown("<br>", unsafe_allow_html=True)
 
             # ── Label colour helper ───────────────────────────────
             LABEL_STYLES = {
-                "REAL":      ("background:#d4edda;color:#155724;", "✅ REAL"),
-                "FAKE":      ("background:#f8d7da;color:#721c24;", "🚨 FAKE"),
-                "UNCERTAIN": ("background:#fff3cd;color:#856404;", "⚠️ UNCERTAIN"),
+                "REAL":      ("background:#d4edda;color:#155724;", "REAL"),
+                "FAKE":      ("background:#f8d7da;color:#721c24;", "FAKE"),
+                "UNCERTAIN": ("background:#fff3cd;color:#856404;", "UNCERTAIN"),
             }
 
             # ── Column headers ────────────────────────────────────
@@ -744,23 +767,19 @@ elif selected_page == "🕒  History":
 
             # ── Rows ──────────────────────────────────────────────
             for _, row in hist_df.iterrows():
-                row_id  = row["id"]
+                row_id     = row["id"]
                 is_checked = row_id in st.session_state.hist_selected
 
                 c0, c1, c2, c3, c4, c5, c6 = st.columns([0.4, 1.2, 0.8, 0.8, 0.7, 1.3, 3.6])
 
                 # Checkbox
                 with c0:
-                    ticked = st.checkbox(
-                        label="",
+                    st.checkbox(
+                        label=f"Select record {row_id}",
                         value=is_checked,
                         key=f"hist_row_{row_id}",
                         label_visibility="collapsed",
                     )
-                    if ticked:
-                        st.session_state.hist_selected.add(row_id)
-                    else:
-                        st.session_state.hist_selected.discard(row_id)
 
                 # Label badge
                 with c1:
@@ -783,8 +802,6 @@ elif selected_page == "🕒  History":
                     st.markdown(f'<p style="margin:0;font-size:0.83rem;color:#333">{row["input_text"]}</p>', unsafe_allow_html=True)
 
                 st.markdown('<hr style="margin:4px 0;border-color:#f0f0f0">', unsafe_allow_html=True)
-
-
 # ══════════════════════════════════════════════
 # PAGE 6 — SUPPORT CHAT
 # ══════════════════════════════════════════════
