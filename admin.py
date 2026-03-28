@@ -52,7 +52,7 @@ _INBOX_CSS = """
     color: #1d1d3b;
     border-radius: 4px 16px 16px 16px;
     padding: 9px 14px;
-    max-width: 70%;
+    max-width: 100%;
     font-size: 0.9rem;
     line-height: 1.6;
     box-shadow: 0 1px 4px rgba(0,0,0,0.08);
@@ -263,7 +263,7 @@ def show_admin_page():
 
 
 # ─────────────────────────────────────────────
-# WHATSAPP-STYLE INBOX
+# INBOX
 # ─────────────────────────────────────────────
 def _show_inbox():
     st.markdown(_INBOX_CSS, unsafe_allow_html=True)
@@ -403,7 +403,7 @@ def _show_inbox():
             # Replies — right
             for r in replies:
                 html += (
-                    f'<div class="wa-row-right"><div style="max-width:80%">'
+                    f'<div class="wa-row-right"><div style="max-width:100%">'
                     f'<div class="wa-bubble-admin">{r["body"]}</div>'
                     f'<div class="wa-ts">🛡️ <b>{r["admin_name"]}</b>'
                     f' &nbsp;·&nbsp; {r["created_at"][:16]}</div>'
