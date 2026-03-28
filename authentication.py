@@ -50,7 +50,7 @@ def logout():
 # ─────────────────────────────────────────────
 def _get_logo_base64() -> str | None:
     """Read logo.png from the project root and return a base64 string."""
-    logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
+    logo_path = os.path.join(os.path.dirname(__file__), "images/logo.png")
     if not os.path.exists(logo_path):
         return None
     with open(logo_path, "rb") as f:
