@@ -50,7 +50,7 @@ The result is a tool that anyone can use to paste a news article, get an instant
 
 > Try pasting any news headline or full article text. The model returns a **Real** , **Fake** or **Uncertain** label with a confidence score.
 
-![App Screenshot](images/real.png)
+![App Screenshot](images/real.png)![App Screenshot](images/uncertain.png)![App Screenshot](images/fake.png)
 
 ---
 
