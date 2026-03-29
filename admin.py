@@ -369,11 +369,9 @@ def show_admin_page():
     total_safe     = max(total_classif, 1)
     daily_avg      = max(round(recent_7days / 7), 0)   # rough daily rate from 7-day window
 
-    # ── Hero header ───────────────────────────────────────────────────────────
-    from datetime import datetime
-    now_str = datetime.now().strftime("%b %d, %Y · %H:%M")
+       # ── Hero header ─────────
     st.markdown(
-        f"""<div class="dash-hero">
+        """<div class="dash-hero">
             <div class="dash-hero-left">
                 <span class="dash-hero-shield">🛡️</span>
                 <div>
@@ -381,8 +379,24 @@ def show_admin_page():
                     <div class="dash-hero-sub">Fake News Detection System · Control Panel</div>
                 </div>
             </div>
-            <div class="dash-hero-badge">🕐 {now_str}</div>
-        </div>""",
+            <div class="dash-hero-badge" id="eat-clock">🕐 loading...</div>
+        </div>
+        <script>
+        (function () {
+            function pad(n) { return String(n).padStart(2, '0'); }
+            function tick() {
+                var now = new Date();
+                var eat = new Date(now.toLocaleString('en-US', { timeZone: 'Africa/Nairobi' }));
+                var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                var str = eat.getDate() + ' ' + months[eat.getMonth()] + ' ' + eat.getFullYear()
+                        + ' · ' + pad(eat.getHours()) + ':' + pad(eat.getMinutes()) + ':' + pad(eat.getSeconds());
+                var el = document.getElementById('eat-clock');
+                if (el) el.textContent = '🕐 ' + str;
+            }
+            tick();
+            setInterval(tick, 1000);
+        })();
+        </script>""",
         unsafe_allow_html=True,
     )
 
