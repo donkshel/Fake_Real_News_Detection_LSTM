@@ -131,19 +131,48 @@ html, body, [data-testid="stAppViewContainer"] { font-family: 'DM Sans', sans-se
 /* ── Hero ── */
 .hero {
     background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-    border-radius: 18px; padding: 0.2rem; margin-bottom: 0.5rem;
-    text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    border-radius: 18px;
+    height: auto;
+    padding: 0.2rem 0.6rem;
+    margin-bottom: 0.2rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    
+}
+.hero-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.hero-icon {
+    font-size: 2.2rem;
+    filter: drop-shadow(0 0 12px rgba(108,99,255,0.6));
+    flex-shrink: 0;
 }
 .hero h1 {
-    font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 500;
-    color: #fff; margin: 0 0 0.1rem; letter-spacing: -0.5px;
+    font-family: 'Syne', sans-serif;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+    line-height: 1.1;
+    letter-spacing: -0.3px;
 }
-.hero p { color: #b0aed8; font-size: 1.05rem; margin: 0; line-height: 1.2; }
 .hero-badge {
-    display: inline-block; background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2); color: #c9c3f5;
-    border-radius: 50px; font-size: 0.78rem; padding: 4px 14px;
-    margin-top: 0.2rem; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.85);
+    border-radius: 30px;
+    font-size: 0.75rem;
+    padding: 0.45rem 1.1rem;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    font-weight: 600;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 /* ── Section labels ── */
@@ -450,10 +479,13 @@ def make_class_bar(e):
 # ─────────────────────────────────────────────
 st.markdown("""
 <div class="hero">
+    <div class="hero-left">
+        <span class="hero-icon">🔍</span>
+        <div>
+            <h1>Fake News Detection System</h1>            
+        </div>
+    </div>
     <div class="hero-badge">⚡ LSTM · NLP · Deep Learning</div>
-    <h1>🔍 Fake News Detection System</h1>
-    <p>Paste a news article or upload a file — our LSTM model<br>
-    will analyse it and estimate its authenticity in seconds.</p>
 </div>
 """, unsafe_allow_html=True)
 st.divider()
@@ -776,6 +808,7 @@ elif selected_page == "🕒  History":
                 with c0:
                     st.checkbox(
                         label=f"Select record {row_id}",
+                        value=is_checked,
                         key=f"hist_row_{row_id}",
                         label_visibility="collapsed",
                     )

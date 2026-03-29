@@ -17,14 +17,290 @@ from database import (
 )
 
 
-# ─────────────────────────────────────────────
-# SHARED STYLES  (injected once)
-# ─────────────────────────────────────────────
-_INBOX_CSS = """
+# ══════════════════════════════════════════════════════════════════════════════
+#  CSS  
+# ══════════════════════════════════════════════════════════════════════════════
+_ADMIN_CSS = """
 <style>
+/* ── Palette tokens ───────────────────────────────────────────────────────── */
+:root {
+    --blue:    #4a90d9;
+    --purple:  #6c63ff;
+    --green:   #27ae60;
+    --red:     #e63946;
+    --orange:  #f4a261;
+    --ink:     #1d1d3b;
+    --muted:   #7a7a9a;
+    --border:  #eaeaf4;
+    --surface: #ffffff;
+    --page-bg: #f6f7fb;
+}
+
+/* ── Dashboard hero header ────────────────────────────────────────────────── */
+.dash-hero {
+    background: linear-gradient(135deg, #302b63 0%, #1a1a40 60%, #24243e 100%);
+    border-radius: 18px;
+    padding: 2rem 2.2rem 1.8rem;
+    margin-bottom: 1.8rem;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+.dash-hero-left { display: flex; align-items: center; gap: 1rem; }
+.dash-hero-shield {
+    font-size: 2.6rem;
+    filter: drop-shadow(0 0 12px rgba(108,99,255,0.6));
+}
+.dash-hero-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #ffffff;
+    line-height: 1.1;
+    margin: 0;
+}
+.dash-hero-sub {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.55);
+    margin-top: 0.25rem;
+    letter-spacing: 0.5px;
+}
+.dash-hero-badge {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 30px;
+    padding: 0.45rem 1.1rem;
+    font-size: 0.75rem;
+    color: rgba(255,255,255,0.85);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+/* ── Section header ───────────────────────────────────────────────────────── */
+.sec-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin: 0.4rem 0 1rem 0;
+}
+.sec-header-icon {
+    width: 34px; height: 34px;
+    border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+.sec-header-text h4 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--ink);
+    margin: 0;
+    line-height: 1.2;
+}
+.sec-header-text p {
+    font-size: 0.74rem;
+    color: var(--muted);
+    margin: 0.1rem 0 0 0;
+}
+.sec-divider {
+    height: 1px;
+    background: linear-gradient(to right, var(--border), transparent);
+    margin: 1.6rem 0;
+}
+
+/* ── Metric overview card ─────────────────────────────────────────────────── */
+.mc {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 1.4rem 1.3rem 1.2rem;
+    border: 1px solid var(--border);
+    border-left: 5px solid var(--mc-accent);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.045);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+}
+.mc::before {
+    content: '';
+    position: absolute;
+    top: -18px; right: -18px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: var(--mc-accent);
+    opacity: 0.06;
+}
+.mc:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.10);
+}
+.mc-icon-wrap {
+    width: 40px; height: 40px;
+    border-radius: 11px;
+    background: var(--mc-accent);
+    opacity: 0.13;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 0.9rem;
+    /* icon is overlaid via the emoji span */
+}
+.mc-icon-box {
+    position: relative;
+    width: 40px; height: 40px;
+    margin-bottom: 0.9rem;
+}
+.mc-icon-bg {
+    position: absolute; inset: 0;
+    border-radius: 11px;
+    background: var(--mc-accent);
+    opacity: 0.13;
+}
+.mc-icon-emoji {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.15rem;
+    line-height: 1;
+}
+.mc-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 700;
+    text-align: center;
+    color: var(--mc-accent);
+    line-height: 1;
+    margin-bottom: 0.3rem;
+}
+.mc-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 1.1px;
+    color: var(--muted);
+}
+.mc-trend {
+    margin-top: 0.75rem;
+    padding-top: 0.7rem;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; gap: 0.4rem;
+}
+.mc-trend-up   { color: #27ae60; font-size: 0.72rem; font-weight: 700; }
+.mc-trend-down { color: #e63946; font-size: 0.72rem; font-weight: 700; }
+.mc-trend-neu  { color: var(--muted); font-size: 0.72rem; font-weight: 700; }
+.mc-trend-desc { font-size: 0.68rem; color: #b0b0c8; }
+
+/* ── Breakdown card ───────────────────────────────────────────────────────── */
+.bd {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 1.3rem 1.3rem 1.15rem;
+    border: 1px solid var(--border);
+    border-top: 5px solid var(--bd-accent);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.045);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: default;
+}
+.bd:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.10);
+}
+.bd-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.7rem;
+}
+.bd-pill {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    color: var(--bd-accent);
+    background: color-mix(in srgb, var(--bd-accent) 12%, white);
+    border: 1px solid color-mix(in srgb, var(--bd-accent) 22%, white);
+    border-radius: 20px;
+    padding: 3px 10px;
+}
+.bd-emoji { font-size: 1.25rem; }
+.bd-count {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.1rem;
+    font-weight: 700;
+    text-align: center;
+    color: var(--bd-accent);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+.bd-sub {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: 500;
+}
+.bd-bar-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 0.3rem;
+}
+.bd-bar-name { font-size: 0.7rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; }
+.bd-bar-pct  { font-size: 0.78rem; color: var(--bd-accent); font-weight: 700; }
+.bd-bar-bg {
+    background: #f0f0f7;
+    border-radius: 99px;
+    height: 7px;
+    width: 100%;
+    overflow: hidden;
+}
+.bd-bar-fill {
+    height: 100%;
+    border-radius: 99px;
+    background: linear-gradient(90deg, var(--bd-accent), color-mix(in srgb, var(--bd-accent) 70%, white));
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Live monitoring container ────────────────────────────────────────────── */
+.monitor-wrap {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 1.4rem 1.4rem 0.5rem;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.045);
+}
+.monitor-legend {
+    display: flex;
+    gap: 1.4rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+.legend-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+/* ── Section pills for user mgmt / history ────────────────────────────────── */
+.section-card {
+    background: var(--surface);
+    border-radius: 16px;
+    padding: 1.4rem;
+    border: 1px solid var(--border);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.035);
+    margin-bottom: 0.6rem;
+}
+
+/* ── WhatsApp inbox bubbles ) ───────────────────────────────────── */
 .wa-bg-admin {
     background: #ece5dd;
-    border-radius: 0 0 0 0;
+    border-radius: 0;
     padding: 1rem;
     min-height: 400px;
     max-height: 520px;
@@ -35,7 +311,6 @@ _INBOX_CSS = """
 }
 .wa-row-right { display: flex; justify-content: flex-end; }
 .wa-row-left  { display: flex; justify-content: flex-start; }
-
 .wa-bubble-user {
     background: #302b63;
     color: white;
@@ -60,7 +335,7 @@ _INBOX_CSS = """
     word-wrap: break-word;
 }
 .wa-ts       { font-size: 0.68rem; color: #aaa; margin-top: 3px; padding: 0 3px; }
-.wa-ts-left { text-align: left; }
+.wa-ts-left  { text-align: left; }
 .wa-divider  {
     text-align: center;
     font-size: 0.72rem;
@@ -71,57 +346,139 @@ _INBOX_CSS = """
 </style>
 """
 
-
-# ─────────────────────────────────────────────
-# ADMIN DASHBOARD
-# ─────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
+#  ADMIN DASHBOARD  —  main entry point
+# ══════════════════════════════════════════════════════════════════════════════
 def show_admin_page():
-    st.markdown('<h3 class="section-label">🛡️ Admin Dashboard</h3>', unsafe_allow_html=True)
+    # Inject CSS once
+    st.markdown(_ADMIN_CSS, unsafe_allow_html=True)
 
-    stats = get_admin_stats()
-    total_users   = stats.get("total_users", 0)
+    # ── Data ──────────────────────────────────────────────────────────────────
+    stats         = get_admin_stats()
+    total_users   = stats.get("total_users",   0)
     total_classif = stats.get("total_classif", 0)
-    recent_7days  = stats.get("recent_7days", 0)
-    real_count    = stats.get("real_count", 0)
-    fake_count    = stats.get("fake_count", 0)
-    uncertain     = stats.get("uncertain", 0)
+    recent_7days  = stats.get("recent_7days",  0)
+    real_count    = stats.get("real_count",    0)
+    fake_count    = stats.get("fake_count",    0)
+    uncertain     = stats.get("uncertain",     0)
 
     users       = get_all_users()
     admin_count = sum(1 for u in users if u["role"] == "admin") if users else 0
 
-    # ── Overview metrics ──────────────────────────────────────────────
-    c1, c2, c3, c4 = st.columns(4)
-    _stat_card(c1, total_users,   "Registered Users",      "#6c63ff")
-    _stat_card(c2, total_classif, "Total Classifications", "#4a90d9")
-    _stat_card(c3, recent_7days,  "Last 7 Days",           "#52b788")
-    _stat_card(c4, admin_count,   "Admin Accounts",        "#f4a261")
+    # Derived helpers
+    total_safe     = max(total_classif, 1)
+    daily_avg      = max(round(recent_7days / 7), 0)   # rough daily rate from 7-day window
 
-    st.divider()
+    # ── Hero header ───────────────────────────────────────────────────────────
+    from datetime import datetime
+    now_str = datetime.now().strftime("%b %d, %Y · %H:%M")
+    st.markdown(
+        f"""<div class="dash-hero">
+            <div class="dash-hero-left">
+                <span class="dash-hero-shield">🛡️</span>
+                <div>
+                    <div class="dash-hero-title">Admin Dashboard</div>
+                    <div class="dash-hero-sub">Fake News Detection System · Control Panel</div>
+                </div>
+            </div>
+            <div class="dash-hero-badge">🕐 {now_str}</div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
 
-    # ── Label distribution ────────────────────────────────────────────
-    st.markdown("<h4>🔍 Classification Breakdown</h4>", unsafe_allow_html=True)
-    col_r, col_f, col_u = st.columns(3)
-    _stat_card(col_r, real_count, "REAL",      "#52b788")
-    _stat_card(col_f, fake_count, "FAKE",      "#e63946")
-    _stat_card(col_u, uncertain,  "UNCERTAIN", "#f4a261")
+    # ─────────────────────────────────────────────────────────────────────────
+    # SECTION 1 — Overview metrics
+    # ─────────────────────────────────────────────────────────────────────────
+    _section_header("📊", "#4a90d9", "Platform Overview", "Live snapshot of system activity")
 
-    st.divider()
+    c1, c2, c3, c4 = st.columns(4, gap="small")
+    _metric_card(c1,
+        icon="👥", value=total_users, label="Registered Users",
+        color="#6c63ff",
+        trend_value=f"+{admin_count} admin{'s' if admin_count != 1 else ''}",
+        trend_dir="neu",  trend_desc="role breakdown",
+    )
+    _metric_card(c2,
+        icon="📋", value=total_classif, label="Total Classifications",
+        color="#4a90d9",
+        trend_value=f"+{recent_7days}",
+        trend_dir="up",   trend_desc="last 7 days",
+    )
+    _metric_card(c3,
+        icon="⚡", value=recent_7days, label="Last 7 Days",
+        color="#27ae60",
+        trend_value=f"~{daily_avg}/day",
+        trend_dir="up",   trend_desc="daily average",
+    )
+    _metric_card(c4,
+        icon="🛡️", value=admin_count, label="Admin Accounts",
+        color="#f4a261",
+        trend_value=f"{total_users - admin_count} regular",
+        trend_dir="neu",  trend_desc="non-admin users",
+    )
 
-    # ── Live Monitoring ───────────────────────────────────────────────
-    st.markdown("<h4>⚡ Live Fake News Detection Monitoring</h4>", unsafe_allow_html=True)
+    st.markdown('<div class="sec-divider"></div>', unsafe_allow_html=True)
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # SECTION 2 — Classification Breakdown
+    # ─────────────────────────────────────────────────────────────────────────
+    _section_header("🔍", "#6c63ff", "Classification Breakdown",
+                    f"Distribution across {total_classif} total predictions")
+
+    col_r, col_f, col_u = st.columns(3, gap="small")
+    _breakdown_card(col_r,
+        value=real_count, label="REAL", color="#27ae60",
+        emoji="✅", total=total_safe,
+        sub="Verified credible articles",
+    )
+    _breakdown_card(col_f,
+        value=fake_count, label="FAKE", color="#e63946",
+        emoji="🚨", total=total_safe,
+        sub="Flagged misinformation",
+    )
+    _breakdown_card(col_u,
+        value=uncertain, label="UNCERTAIN", color="#f4a261",
+        emoji="❓", total=total_safe,
+        sub="Low-confidence results",
+    )
+
+    st.markdown('<div class="sec-divider"></div>', unsafe_allow_html=True)
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # SECTION 3 — Live Monitoring
+    # ─────────────────────────────────────────────────────────────────────────
+    _section_header("⚡", "#f4a261", "Live Detection Monitoring",
+                    "Real-time distribution of predictions across the platform")
+
+    st.markdown('<div class="monitor-wrap">', unsafe_allow_html=True)
+    st.markdown(
+        f"""<div class="monitor-legend">
+            <span><span class="legend-dot" style="background:#27ae60;"></span>
+                <span style="font-size:0.75rem;color:#555;font-weight:600;">REAL — {real_count}</span></span>
+            <span><span class="legend-dot" style="background:#e63946;"></span>
+                <span style="font-size:0.75rem;color:#555;font-weight:600;">FAKE — {fake_count}</span></span>
+            <span><span class="legend-dot" style="background:#f4a261;"></span>
+                <span style="font-size:0.75rem;color:#555;font-weight:600;">UNCERTAIN — {uncertain}</span></span>
+        </div>""",
+        unsafe_allow_html=True,
+    )
     chart_data = pd.DataFrame({
         "Label": ["REAL", "FAKE", "UNCERTAIN"],
         "Count": [real_count, fake_count, uncertain],
     })
-    st.bar_chart(chart_data.set_index("Label"))
-    st.caption("Live distribution of predictions across the platform.")
+    st.bar_chart(chart_data.set_index("Label"), color=["#27ae60"])
+    st.caption("Chart auto-refreshes on page reload. Data reflects all-time totals.")
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    # ── User Management ───────────────────────────────────────────────
-    st.divider()
-    st.markdown("<h4>👩‍🦲 User Management</h4>", unsafe_allow_html=True)
+    st.markdown('<div class="sec-divider"></div>', unsafe_allow_html=True)
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # SECTION 4 — User Management
+    # ─────────────────────────────────────────────────────────────────────────
+    _section_header("👥", "#4a90d9", "User Management", "View, edit roles, and manage accounts")
 
     if not users:
-        st.info("No users yet.")
+        st.info("No users registered yet.")
     else:
         users_df = pd.DataFrame(
             [dict(u) for u in users],
@@ -130,7 +487,9 @@ def show_admin_page():
         users_df.insert(0, "#", range(1, len(users_df) + 1))
         st.dataframe(users_df.drop(columns=["id"]), use_container_width=True, hide_index=True)
 
-        st.markdown("<h4>⚙️ Manage a user</h4>", unsafe_allow_html=True)
+        st.markdown("<br>", unsafe_allow_html=True)
+        _section_header("⚙️", "#6c63ff", "Manage a User", "Update roles or remove accounts")
+
         user_options  = {u["username"]: u["id"] for u in users}
         selected_name = st.selectbox("Select user", list(user_options.keys()))
         selected_id   = user_options[selected_name]
@@ -184,13 +543,8 @@ def show_admin_page():
                         st.rerun()
 
         st.markdown("---")
-        st.markdown("<h4>🔑 Reset Password</h4>", unsafe_allow_html=True)
-        st.markdown(
-            f"<p style='font-size:0.88rem;color:#666;margin-top:-0.4rem;'>"
-            f"Set a new password for <b>{selected_name}</b>. "
-            f"Share it with them securely after resetting.</p>",
-            unsafe_allow_html=True,
-        )
+        _section_header("🔑", "#f4a261", "Reset Password",
+                        f"Set a new password for {selected_name} — share securely after resetting.")
         pw_col1, pw_col2 = st.columns(2)
         with pw_col1:
             new_pw = st.text_input(
@@ -216,15 +570,19 @@ def show_admin_page():
                 else:
                     st.error("Something went wrong. Please try again.")
 
-    st.divider()
+    st.markdown('<div class="sec-divider"></div>', unsafe_allow_html=True)
 
-    # ── Support Inbox — WhatsApp style ────────────────────────────────
+    # ── Support Inbox ─────────────────────────────────────────────────────────
     _show_inbox()
 
-    st.divider()
+    st.markdown('<div class="sec-divider"></div>', unsafe_allow_html=True)
 
-    # ── Global History ────────────────────────────────────────────────
-    st.markdown("<h4>👁‍🗨 Classifications History (all users)</h4>", unsafe_allow_html=True)
+    # ─────────────────────────────────────────────────────────────────────────
+    # SECTION 5 — Classification History
+    # ─────────────────────────────────────────────────────────────────────────
+    _section_header("👁", "#27ae60", "Classifications History",
+                    "Full audit log of all user predictions (last 200 records)")
+
     all_history = get_all_history(limit=200)
 
     if not all_history:
@@ -232,66 +590,68 @@ def show_admin_page():
     else:
         hist_df = pd.DataFrame(
             [dict(h) for h in all_history],
-            columns=["id","user_id","input_text","label","real_prob",
-                     "fake_prob","word_count","classified_at","deleted_by_user","username"],
+            columns=["id", "user_id", "input_text", "label", "real_prob",
+                     "fake_prob", "word_count", "classified_at", "deleted_by_user", "username"],
         )
         hist_df["input_text"] = hist_df["input_text"].str[:80] + "…"
         hist_df["real_prob"]  = hist_df["real_prob"].round(3)
         hist_df["fake_prob"]  = hist_df["fake_prob"].round(3)
-        # Human-readable cleared indicator
         hist_df["visibility"] = hist_df["deleted_by_user"].apply(
             lambda x: "🗑 Cleared by user" if x == 1 else "✅ Visible to user"
         )
 
-        # Summary callout
         n_cleared = int(hist_df["deleted_by_user"].sum())
         if n_cleared:
             st.markdown(
-                f'<div style="background:#fff8e1;border:1px solid #ffe082;border-radius:8px;'
-                f'padding:0.6rem 1rem;font-size:0.88rem;color:#7a5c00;margin-bottom:0.6rem;">'
-                f'⚠️ <b>{n_cleared}</b> record(s) were cleared by users but are retained here '
-                f'for audit purposes.</div>',
+                f'<div style="background:#fff8e1;border:1px solid #ffe082;border-radius:10px;'
+                f'padding:0.65rem 1rem;font-size:0.85rem;color:#7a5c00;margin-bottom:0.8rem;">'
+                f'⚠️ &nbsp;<b>{n_cleared}</b> record(s) cleared by users are retained here for audit purposes.</div>',
                 unsafe_allow_html=True,
             )
 
         st.dataframe(
-            hist_df[["username","label","real_prob","fake_prob",
-                     "word_count","classified_at","visibility","input_text"]],
+            hist_df[["username", "label", "real_prob", "fake_prob",
+                     "word_count", "classified_at", "visibility", "input_text"]],
             use_container_width=True,
             hide_index=True,
         )
 
 
-# ─────────────────────────────────────────────
-# INBOX
-# ─────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════════════════
+#  SUPPORT INBOX  (WhatsApp-style, logic unchanged)
+# ══════════════════════════════════════════════════════════════════════════════
 def _show_inbox():
-    st.markdown(_INBOX_CSS, unsafe_allow_html=True)
-
-    open_count   = get_open_message_count()
-    badge_html   = (
-        f" &nbsp;<span style='background:#e63946;color:white;border-radius:12px;"
+    open_count = get_open_message_count()
+    badge_html = (
+        f"&nbsp;<span style='background:#e63946;color:white;border-radius:12px;"
         f"padding:2px 9px;font-size:0.78rem;'>{open_count} open</span>"
         if open_count > 0 else ""
     )
-    st.markdown(f"<h4>💬 Support Inbox{badge_html}</h4>", unsafe_allow_html=True)
+    _section_header("💬", "#302b63", f"Support Inbox",
+                    "User messages and admin replies")
+    if open_count > 0:
+        st.markdown(
+            f'<div style="margin-top:-0.6rem;margin-bottom:0.8rem;">'
+            f'<span style="background:#e63946;color:white;border-radius:12px;'
+            f'padding:3px 11px;font-size:0.78rem;font-weight:700;">'
+            f'● {open_count} unresolved thread{"s" if open_count != 1 else ""}</span></div>',
+            unsafe_allow_html=True,
+        )
 
     all_messages = get_all_messages()
     if not all_messages:
         st.info("No messages from users yet.")
         return
 
-    # Session state for selected user
     if "admin_inbox_uid" not in st.session_state:
         st.session_state.admin_inbox_uid = None
     if "admin_reply_mid" not in st.session_state:
-        st.session_state.admin_reply_mid = None   # which message thread is reply box open for
+        st.session_state.admin_reply_mid = None
 
-    # Group messages by user
     from collections import defaultdict
-    users_map   = {}   # uid -> {"username": ..., "messages": [...], "open": n}
+    users_map = {}
     for msg in all_messages:
-        m = dict(msg)
+        m   = dict(msg)
         uid = m["user_id"]
         if uid not in users_map:
             users_map[uid] = {"username": m["username"], "messages": [], "open": 0}
@@ -301,15 +661,14 @@ def _show_inbox():
 
     left, right = st.columns([1, 2.4], gap="small")
 
-    # ── LEFT — user list ─────────────────────────────────────────────
+    # ── LEFT — user list ──────────────────────────────────────────────────────
     with left:
         st.markdown(
-            '<p style="font-family:Syne,sans-serif;font-weight:700;font-size:0.8rem;'
-            'color:#4a4a7a;text-transform:uppercase;letter-spacing:1.2px;margin-bottom:0.6rem;">'
-            'Users</p>',
+            '<p style="font-family:Syne,sans-serif;font-weight:700;font-size:0.75rem;'
+            'color:#4a4a7a;text-transform:uppercase;letter-spacing:1.3px;margin-bottom:0.6rem;">'
+            'Conversations</p>',
             unsafe_allow_html=True,
         )
-
         for uid, data in users_map.items():
             is_active  = st.session_state.admin_inbox_uid == uid
             bg         = "rgba(48,43,99,0.1)" if is_active else "#fff"
@@ -321,8 +680,7 @@ def _show_inbox():
                 f'padding:1px 7px;font-size:0.68rem;margin-left:5px;">{n_open}</span>'
                 if n_open > 0 else ""
             )
-            last_msg = data["messages"][0]["created_at"][:16]   # already ordered DESC
-
+            last_msg = data["messages"][0]["created_at"][:16]
             st.markdown(
                 f"""<div style="border:1px solid {border};border-radius:10px;
                     padding:9px 11px;background:{bg};margin-bottom:4px;">
@@ -340,7 +698,7 @@ def _show_inbox():
                 st.session_state.admin_reply_mid = None
                 st.rerun()
 
-    # ── RIGHT — conversation view ────────────────────────────────────
+    # ── RIGHT — conversation view ─────────────────────────────────────────────
     with right:
         uid = st.session_state.admin_inbox_uid
 
@@ -353,7 +711,7 @@ def _show_inbox():
                     <div style="font-family:Syne,sans-serif;font-weight:700;color:#4a4a7a;
                                 margin-top:0.5rem;font-size:1.05rem;">Support Inbox</div>
                     <div style="font-size:0.85rem;color:#aaa;margin-top:0.3rem;">
-                        Select a user on the left to view their messages.</div>
+                        Select a conversation on the left.</div>
                 </div>""",
                 unsafe_allow_html=True,
             )
@@ -361,11 +719,10 @@ def _show_inbox():
 
         data     = users_map[uid]
         username = data["username"]
-        msgs     = data["messages"]   # ordered newest first from DB; reverse for chat order
+        msgs     = data["messages"]
         msgs_asc = list(reversed(msgs))
 
-        # Header bar
-        n_open = data["open"]
+        n_open   = data["open"]
         open_txt = f"{n_open} open" if n_open else "all resolved"
         st.markdown(
             f'<div style="background:linear-gradient(135deg,#302b63,#24243e);'
@@ -379,19 +736,14 @@ def _show_inbox():
             unsafe_allow_html=True,
         )
 
-        # ── Build bubble HTML ─────────────────────────────────────────
         html = '<div class="wa-bg-admin">'
         for m in msgs_asc:
             m_id    = m["id"]
             replies = [dict(r) for r in get_replies_for_message(m_id)]
-
-            # Thread subject divider
             html += (
                 f'<div class="wa-divider">── {m["subject"]} '
                 f'· {m["created_at"][:16]} ──</div>'
             )
-
-            # User message — left
             html += (
                 f'<div class="wa-row-left"><div style="max-width:80%">'
                 f'<div class="wa-bubble-user">{m["body"]}</div>'
@@ -399,8 +751,6 @@ def _show_inbox():
                 f'{username} &nbsp;·&nbsp; {m["created_at"][:16]}</div>'
                 f'</div></div>'
             )
-
-            # Replies — right
             for r in replies:
                 html += (
                     f'<div class="wa-row-right"><div style="max-width:100%">'
@@ -409,17 +759,14 @@ def _show_inbox():
                     f' &nbsp;·&nbsp; {r["created_at"][:16]}</div>'
                     f'</div></div>'
                 )
-
         html += '</div>'
         st.markdown(html, unsafe_allow_html=True)
 
-        # ── Action buttons per thread ─────────────────────────────────
         st.markdown("<div style='height:6px'></div>", unsafe_allow_html=True)
         for m in msgs_asc:
-            m_id           = m["id"]
-            reply_key      = f"admin_reply_open_{m_id}"
-            is_reply_open  = st.session_state.admin_reply_mid == m_id
-            status_label   = "✅ Resolved" if m["status"] == "resolved" else "🕐 Open"
+            m_id          = m["id"]
+            is_reply_open = st.session_state.admin_reply_mid == m_id
+            status_label  = "✅ Resolved" if m["status"] == "resolved" else "🕐 Open"
 
             with st.expander(f'📩 **{m["subject"]}** — {status_label}', expanded=False):
                 col_reply, col_status, col_del = st.columns([2, 2, 1])
@@ -448,7 +795,6 @@ def _show_inbox():
                         st.success("Deleted.")
                         st.rerun()
 
-                # Reply text box
                 if is_reply_open:
                     reply_text = st.text_area(
                         "Your reply",
@@ -471,25 +817,114 @@ def _show_inbox():
                                 st.error("Failed to send reply.")
 
 
-# ─────────────────────────────────────────────
-# HELPER — stat card
-# ─────────────────────────────────────────────
-def _stat_card(col, value, label, color):
+# ══════════════════════════════════════════════════════════════════════════════
+#  REUSABLE UI COMPONENTS
+# ══════════════════════════════════════════════════════════════════════════════
+
+def _section_header(icon: str, icon_bg: str, title: str, subtitle: str = ""):
+    """Render a styled section heading with icon pill + title + optional subtitle."""
+    sub_html = (
+        f'<p style="font-size:0.73rem;color:#7a7a9a;margin:0.1rem 0 0 0;">{subtitle}</p>'
+        if subtitle else ""
+    )
+    st.markdown(
+        f"""<div class="sec-header">
+            <div class="sec-header-icon"
+                 style="background:color-mix(in srgb,{icon_bg} 14%,white);
+                        border:1px solid color-mix(in srgb,{icon_bg} 25%,white);">
+                {icon}
+            </div>
+            <div class="sec-header-text">
+                <h4>{title}</h4>
+                {sub_html}
+            </div>
+        </div>""",
+        unsafe_allow_html=True,
+    )
+
+
+def _metric_card(
+    col,
+    icon:        str,
+    value:       int | float,
+    label:       str,
+    color:       str,
+    trend_value: str = "",
+    trend_dir:   str = "neu",   # "up" | "down" | "neu"
+    trend_desc:  str = "",
+):
+    """
+    Render a metric overview card with:
+      - Tinted icon box
+      - Large bold value in accent colour
+      - UPPERCASE label
+      - Trend row with directional arrow and description
+    """
+    arrow_map = {"up": "▲", "down": "▼", "neu": "●"}
+    class_map = {"up": "mc-trend-up", "down": "mc-trend-down", "neu": "mc-trend-neu"}
+    arrow = arrow_map.get(trend_dir, "●")
+    cls   = class_map.get(trend_dir, "mc-trend-neu")
+
+    trend_html = ""
+    if trend_value:
+        trend_html = (
+            f'<div class="mc-trend">'
+            f'  <span class="{cls}">{arrow} {trend_value}</span>'
+            f'  <span class="mc-trend-desc">{trend_desc}</span>'
+            f'</div>'
+        )
+
     with col:
         st.markdown(
-            f"""<div class="stat-box" style="display:flex;flex-direction:column;align-items:center;padding:1.2rem 1rem;">
-                <div style="
-                    width:72px;height:72px;border-radius:50%;
-                    border:3px solid {color};background:transparent;
-                    display:flex;align-items:center;justify-content:center;
-                    margin-bottom:0.6rem;
-                ">
-                    <span style="
-                        font-family:'Syne',sans-serif;font-size:1.6rem;
-                        font-weight:800;color:{color};line-height:1;
-                    ">{value}</span>
-                </div>
-                <div class="stat-label">{label}</div>
-            </div>""",
+            f"""<div class="mc" style="--mc-accent:{color};">
+                    <div class="mc-icon-box">
+                        <div class="mc-icon-bg"></div>
+                        <div class="mc-icon-emoji">{icon}</div>
+                    </div>
+                    <div class="mc-value">{value}</div>
+                    <div class="mc-label">{label}</div>
+                    {trend_html}
+                </div>""",
+            unsafe_allow_html=True,
+        )
+
+
+def _breakdown_card(
+    col,
+    value: int,
+    label: str,
+    color: str,
+    emoji: str,
+    total: int,
+    sub:   str = "",
+):
+    """
+    Render a classification breakdown card with:
+      - Pill label + emoji header
+      - Large count
+      - Gradient progress bar
+      - Percentage caption
+    """
+    pct = round((value / total) * 100, 1) if total else 0.0
+    sub_html = (
+        f'<div class="bd-sub">{sub}</div>' if sub else ""
+    )
+    with col:
+        st.markdown(
+            f"""<div class="bd" style="--bd-accent:{color};">
+                    <div class="bd-top">
+                        <span class="bd-pill">{label}</span>
+                        <span class="bd-emoji">{emoji}</span>
+                    </div>
+                    <div class="bd-count">{value}</div>
+                    {sub_html}
+                    <div class="bd-bar-label">
+                        <span class="bd-bar-name">Share of total</span>
+                        <span class="bd-bar-pct">{pct}%</span>
+                    </div>
+                    <div class="bd-bar-bg">
+                        <div class="bd-bar-fill" style="width:{pct}%;"></div>
+                    </div>
+                </div>""",
             unsafe_allow_html=True,
         )
