@@ -112,8 +112,8 @@ The model was trained on a unified dataset assembled from four distinct sources:
 
 | Source | Type | Description |
 |---|---|---|
-| [Kaggle - True News](https://www.kaggle.com/clmentbisaillon/fake-and-real-news-dataset) | Real | Reuters articles, global coverage |
-| [Kaggle - Fake News](https://www.kaggle.com/clmentbisaillon/fake-and-real-news-dataset) | Fake | PolitiFact-labelled fake articles |
+| [Kaggle - True News](https://www.kaggle.com/clmentbisaillon/fake-and-real-news-dataset/data) | Real | Reuters articles, global coverage |
+| [Kaggle - Fake News](https://www.kaggle.com/clmentbisaillon/fake-and-real-news-dataset/data) | Fake | PolitiFact-labelled fake articles |
 | Kenya scraped news | Real | Scraped from Nation Africa, Standard Media, The Star |
 | Kenya historical news | Real | Archived Kenyan news articles |
 
@@ -138,10 +138,10 @@ The model was trained on a unified dataset assembled from four distinct sources:
 |F1 score | 99.18% |
 
 
-![Training Curves](assets/training_curves.png)
+![Training Curves](images/training_curves.png)
 
 <!-- Add a confusion matrix if available -->
-<!-- ![Confusion Matrix](assets/confusion_matrix.png) -->
+<!-- ![Confusion Matrix](images/confusion_matrix.png) -->
 
 > **Note on overfitting:** Early stopping and dropout regularization were applied to prevent the model from memorizing training data. Validation accuracy is the metric that matters most here.
 
