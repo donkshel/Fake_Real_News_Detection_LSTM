@@ -1,6 +1,6 @@
 # 🕵️ Fake News Detection App
 
-> A deep learning web app that classifies news articles as **real or fake** — with special focus on Kenyan news sources often missed by global models.
+> A Bidirectional based Deep Learning web application that classifies news articles as **real or fake** — with special focus on Kenyan news sources often missed by global models.
 
 [![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.18-FF6F00?style=flat&logo=tensorflow&logoColor=white)](https://tensorflow.org)
@@ -10,7 +10,7 @@
 [![Status](https://img.shields.io/badge/Status-Live-22C55E?style=flat)]()
 
 <!-- Replace the line below with your actual demo GIF -->
-![App Demo](assets/demo.gif)
+![App Demo](images/demo.gif)
 
 ---
 
@@ -56,13 +56,13 @@ The result is a tool that anyone can use to paste a news article, get an instant
 
 ## Key Features
 
-- **Bidirectional LSTM model** — captures context from both directions in a sequence, making it more powerful than a standard LSTM for text classification
-- **Kenyan news scraper** — a custom-built scraper targeting [Nation Africa](https://nation.africa), [Standard Media](https://standardmedia.co.ke), and [The Star Kenya](https://the-star.co.ke)
-- **Merged multi-source dataset** — combines global Kaggle datasets with locally scraped and historical Kenyan news for broader coverage
-- **Firebase Firestore authentication** — persistent, cloud-based user authentication that works reliably on Streamlit Cloud's ephemeral filesystem
-- **Dark themed UI** — custom Streamlit CSS with a deep purple gradient palette (`#0f0c29` → `#302b63`) and Syne font for a polished look
-- **Real-time prediction** — confidence score output alongside the Real/Fake label
-- **Git LFS managed** — large model files (`.keras`, tokenizer) tracked with Git LFS for clean repository management
+- **Bidirectional LSTM model** - captures context from both directions in a sequence, making it more powerful than a standard LSTM for text classification
+- **Kenyan news scraper** - a custom-built scraper targeting [Nation Africa](https://nation.africa), [Standard Media](https://standardmedia.co.ke), and [The Star Kenya](https://the-star.co.ke)
+- **Merged multi-source dataset** - combines global Kaggle datasets with locally scraped and historical Kenyan news for broader coverage
+- **Firebase Firestore authentication** - persistent, cloud-based user authentication that works reliably on Streamlit Cloud's ephemeral filesystem
+- **Dark themed UI** - custom Streamlit CSS with a deep purple gradient palette (`#0f0c29` → `#302b63`) and Syne font for a polished look
+- **Real-time prediction** - confidence score output alongside the Real/Fake label
+- **Git LFS managed** - large model files (`.keras`, tokenizer) tracked with Git LFS for clean repository management
 
 ---
 
@@ -220,12 +220,12 @@ fake-news-detection/
 │   ├── kenya.csv
 │   └── news.csv
 │
-├── notebooks/
+├── notebook/
 │   └── LSTM_Based_Fake_News_Detection.ipynb   # Training, evaluation, and analysis
 │
-├── assets/
+├── images/
 │   ├── demo.gif
-│   └── screenshot.png
+│   └── screenshots.png(true/uncertain/fake)
 │
 └── .gitattributes          # Git LFS tracking rules
 ```
