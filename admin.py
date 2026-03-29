@@ -36,49 +36,6 @@ _ADMIN_CSS = """
     --page-bg: #f6f7fb;
 }
 
-/* ── Dashboard hero header ────────────────────────────────────────────────── */
-.dash-hero {
-    background: linear-gradient(135deg, #302b63 0%, #1a1a40 60%, #24243e 100%);
-    border-radius: 18px;
-    padding: 2rem 2.2rem 1.8rem;
-    margin-bottom: 1.8rem;
-    height: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-}
-.dash-hero-left { display: flex; align-items: center; gap: 1rem; }
-.dash-hero-shield {
-    font-size: 2.6rem;
-    filter: drop-shadow(0 0 12px rgba(108,99,255,0.6));
-}
-.dash-hero-title {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.7rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: #ffffff;
-    line-height: 1.1;
-    margin: 0;
-}
-.dash-hero-sub {
-    font-size: 0.8rem;
-    color: rgba(255,255,255,0.55);
-    margin-top: 0.25rem;
-    letter-spacing: 0.5px;
-}
-.dash-hero-badge {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.2);
-    border-radius: 30px;
-    padding: 0.45rem 1.1rem;
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.85);
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-}
 
 /* ── Section header ───────────────────────────────────────────────────────── */
 .sec-header {
@@ -369,36 +326,72 @@ def show_admin_page():
     total_safe     = max(total_classif, 1)
     daily_avg      = max(round(recent_7days / 7), 0)   # rough daily rate from 7-day window
 
-       # ── Hero header ─────────
-    st.markdown(
-        """<div class="dash-hero">
-            <div class="dash-hero-left">
-                <span class="dash-hero-shield">🛡️</span>
+     # ── Hero header ───────────
+    import streamlit.components.v1 as components
+    components.html("""
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: transparent; }
+        .dash-hero {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            border-radius: 18px;
+            padding: 1.5rem 2rem;
+            display: flex;
+            height: 70px;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .left { display: flex; align-items: center; gap: 1rem; }
+        .shield { font-size: 2.6rem; filter: drop-shadow(0 0 12px rgba(108,99,255,0.6)); }
+        .title {
+            font-family: 'Syne', sans-serif;
+            font-size: 1.7rem; font-weight: 700;
+            text-transform: uppercase;
+            color: #fff; line-height: 1.1;
+        }
+        .sub {
+            font-size: 0.8rem; color: rgba(255,255,255,0.55);
+            margin-top: 0.25rem; letter-spacing: 0.5px;
+        }
+        .badge {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 30px;
+            padding: 0.45rem 1.1rem;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.85);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+        </style>
+        <div class="dash-hero">
+            <div class="left">
+                <span class="shield">🛡️</span>
                 <div>
-                    <div class="dash-hero-title">Admin Dashboard</div>
-                    <div class="dash-hero-sub">Fake News Detection System · Control Panel</div>
+                    <div class="title">Admin Dashboard</div>
+                    <div class="sub">Fake News Detection System · Control Panel</div>
                 </div>
             </div>
-            <div class="dash-hero-badge" id="eat-clock">🕐 loading...</div>
+            <div class="badge" id="clk">🕐 --:--:--</div>
         </div>
         <script>
-        (function () {
-            function pad(n) { return String(n).padStart(2, '0'); }
-            function tick() {
-                var now = new Date();
-                var eat = new Date(now.toLocaleString('en-US', { timeZone: 'Africa/Nairobi' }));
-                var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-                var str = eat.getDate() + ' ' + months[eat.getMonth()] + ' ' + eat.getFullYear()
-                        + ' · ' + pad(eat.getHours()) + ':' + pad(eat.getMinutes()) + ':' + pad(eat.getSeconds());
-                var el = document.getElementById('eat-clock');
-                if (el) el.textContent = '🕐 ' + str;
-            }
-            tick();
-            setInterval(tick, 1000);
-        })();
-        </script>""",
-        unsafe_allow_html=True,
-    )
+        function pad(n) { return String(n).padStart(2, '0'); }
+        function tick() {
+            var now  = new Date();
+            var eat  = new Date(now.toLocaleString('en-US', { timeZone: 'Africa/Nairobi' }));
+            var mon  = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            var str  = eat.getDate() + ' ' + mon[eat.getMonth()] + ' ' + eat.getFullYear()
+                     + ' · ' + pad(eat.getHours()) + ':' + pad(eat.getMinutes()) + ':' + pad(eat.getSeconds());
+            document.getElementById('clk').textContent = '🕐 ' + str;
+        }
+        tick();
+        setInterval(tick, 1000);
+        </script>
+    """, height=100, scrolling=False)
 
     # ─────────────────────────────────────────────────────────────────────────
     # SECTION 1 — Overview metrics
@@ -458,32 +451,45 @@ def show_admin_page():
 
     st.markdown('<div class="sec-divider"></div>', unsafe_allow_html=True)
 
-    # ─────────────────────────────────────────────────────────────────────────
+        # ─────────────────────────────────────────────────────────────────────────
     # SECTION 3 — Live Monitoring
     # ─────────────────────────────────────────────────────────────────────────
     _section_header("⚡", "#f4a261", "Live Detection Monitoring",
                     "Real-time distribution of predictions across the platform")
-
-    st.markdown('<div class="monitor-wrap">', unsafe_allow_html=True)
-    st.markdown(
-        f"""<div class="monitor-legend">
-            <span><span class="legend-dot" style="background:#27ae60;"></span>
-                <span style="font-size:0.75rem;color:#555;font-weight:600;">REAL — {real_count}</span></span>
-            <span><span class="legend-dot" style="background:#e63946;"></span>
-                <span style="font-size:0.75rem;color:#555;font-weight:600;">FAKE — {fake_count}</span></span>
-            <span><span class="legend-dot" style="background:#f4a261;"></span>
-                <span style="font-size:0.75rem;color:#555;font-weight:600;">UNCERTAIN — {uncertain}</span></span>
-        </div>""",
-        unsafe_allow_html=True,
+ 
+    import plotly.graph_objects as go
+    fig_monitor = go.Figure(data=[
+        go.Bar(
+            x=["REAL", "FAKE", "UNCERTAIN"],
+            y=[real_count, fake_count, uncertain],
+            marker_color=["#27ae60", "#e63946", "#f4a261"],
+            marker_line_width=0,
+            text=[real_count, fake_count, uncertain],
+            textposition="outside",
+            textfont=dict(family="Syne, sans-serif", size=14, color=["#27ae60", "#e63946", "#f4a261"]),
+            hovertemplate="<b>%{x}</b><br>Count: %{y}<extra></extra>",
+        )
+    ])
+    fig_monitor.update_layout(
+        paper_bgcolor="white",
+        plot_bgcolor="#f8f9fb",
+        height=320,
+        margin=dict(l=20, r=20, t=20, b=40),
+        xaxis=dict(
+            tickfont=dict(family="Syne, sans-serif", size=13, color="#1d1d3b"),
+            showgrid=False,
+            linecolor="#eaeaf4",
+        ),
+        yaxis=dict(
+            tickfont=dict(size=11, color="#aaa"),
+            gridcolor="#eaeaf4",
+            showline=False,
+        ),
+        showlegend=False,
     )
-    chart_data = pd.DataFrame({
-        "Label": ["REAL", "FAKE", "UNCERTAIN"],
-        "Count": [real_count, fake_count, uncertain],
-    })
-    st.bar_chart(chart_data.set_index("Label"), color=["#27ae60"])
+    st.plotly_chart(fig_monitor, use_container_width=True)
     st.caption("Chart auto-refreshes on page reload. Data reflects all-time totals.")
-    st.markdown('</div>', unsafe_allow_html=True)
-
+ 
     st.markdown('<div class="sec-divider"></div>', unsafe_allow_html=True)
 
     # ─────────────────────────────────────────────────────────────────────────
