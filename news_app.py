@@ -776,7 +776,6 @@ elif selected_page == "🕒  History":
                 with c0:
                     st.checkbox(
                         label=f"Select record {row_id}",
-                        value=is_checked,
                         key=f"hist_row_{row_id}",
                         label_visibility="collapsed",
                     )
