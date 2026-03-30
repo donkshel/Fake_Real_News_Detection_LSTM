@@ -9,8 +9,8 @@
 [![License](https://img.shields.io/badge/License-MIT-22C55E?style=flat)](#license)
 [![Status](https://img.shields.io/badge/Status-Live-22C55E?style=flat)]()
 
-<!-- Replace the line below with your actual demo GIF -->
-![App Demo](images/demo.gif)
+<!--  demo GIF -->
+![App Demo](images/demo.mp4)
 
 ---
 
