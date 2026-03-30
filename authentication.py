@@ -150,7 +150,7 @@ def show_auth_page():
             gap: 0.75rem;
         }
         .auth-hero h2 {
-            font-size: 1.2rem;
+            font-size: 1rem;
         }
         .auth-hero p {
             font-size: 0.74rem;
