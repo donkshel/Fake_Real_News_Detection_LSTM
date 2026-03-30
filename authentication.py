@@ -167,7 +167,7 @@ def show_auth_page():
     <div class="auth-hero">
         <div class="auth-hero-left">
             <div>
-                <h2>Hey, Welcome ...</h2>
+                <h2>Hey, Welcome</h2>
                 <p>Sign in or create an account to classify news articles/headlines.</p>
             </div>
         </div>
