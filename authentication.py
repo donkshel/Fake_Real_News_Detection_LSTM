@@ -128,6 +128,7 @@ def show_auth_page():
         .auth-hero h2 {
             font-size: 1.4rem;
             white-space: normal;
+            text-align: center;
         }
         .auth-hero p {
             white-space: normal;
