@@ -10,7 +10,7 @@
 [![Status](https://img.shields.io/badge/Status-Live-22C55E?style=flat)]()
 
 <!--  demo GIF -->
-![App Demo](images/demo.mp4)
+![App Demo](images/demo.gif)
 
 ---
 
