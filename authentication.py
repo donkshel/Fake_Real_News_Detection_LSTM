@@ -145,12 +145,12 @@ def show_auth_page():
     @media (max-width: 480px) {
         .auth-hero {
             width: 100%;
-            padding: 1rem 1.1rem;
+            padding: 0.5rem 1rem;
             border-radius: 12px;
             gap: 0.75rem;
         }
         .auth-hero h2 {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
         }
         .auth-hero p {
             font-size: 0.74rem;
