@@ -157,6 +157,8 @@ def show_auth_page():
         }
         .auth-hero-badge {
             font-size: 0.68rem;
+            align-self: flex-end;
+            flex-shrink: 0;
             padding: 0.35rem 0.85rem;
         }
     }
