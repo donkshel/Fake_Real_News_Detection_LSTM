@@ -183,11 +183,8 @@ html, body, [data-testid="stAppViewContainer"] { font-family: 'DM Sans', sans-se
     border-radius: 12px;
     gap: 0.75rem;
 }
-.hero h2 {
+.hero h1 {
     font-size: 1.25rem;
-}
-.hero p {
-    font-size: 0.74rem;
 }
 .hero-badge {
     font-size: 0.68rem;
