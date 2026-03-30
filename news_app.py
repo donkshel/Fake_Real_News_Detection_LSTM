@@ -175,7 +175,25 @@ html, body, [data-testid="stAppViewContainer"] { font-family: 'DM Sans', sans-se
     white-space: nowrap;
     flex-shrink: 0;
 }
-
+/* ── Mobile ── */
+@media (max-width: 480px) {
+.hero {
+    width: 100%;
+    padding: 1rem 1.1rem;
+    border-radius: 12px;
+    gap: 0.75rem;
+}
+.hero h2 {
+    font-size: 1.25rem;
+}
+.hero p {
+    font-size: 0.74rem;
+}
+.hero-badge {
+    font-size: 0.68rem;
+    padding: 0.35rem 0.85rem;
+}
+}
 /* ── Section labels ── */
 .section-label {
     font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700;
