@@ -63,7 +63,8 @@ def _get_logo_base64() -> str | None:
 # ─────────────────────────────────────────────
 def show_auth_page():
     st.markdown("""
-    <div style="
+    <style>
+    .auth-hero {
         background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
         border-radius: 15px;
         padding: 0.2rem 1.2rem;
@@ -76,27 +77,99 @@ def show_auth_page():
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
-    ">
-        <div style="display:flex; align-items:center; gap:1rem;">
+    }
+    .auth-hero-left {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        min-width: 0;
+    }
+    .auth-hero h2 {
+        font-family: 'Syne', sans-serif;
+        font-size: 1.7rem;
+        font-weight: 600;
+        color: #fff;
+        margin: 0;
+        line-height: 1.1;
+        letter-spacing: -0.3px;
+        white-space: nowrap;
+    }
+    .auth-hero p {
+        color: rgba(255,255,255,0.55);
+        font-size: 0.8rem;
+        margin: 0.25rem 0 0 0;
+        line-height: 1.4;
+        white-space: nowrap;
+    }
+    .auth-hero-badge {
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.2);
+        color: rgba(255,255,255,0.85);
+        border-radius: 30px;
+        font-size: 0.75rem;
+        padding: 0.45rem 1.1rem;
+        letter-spacing: 0.8px;
+        text-transform: uppercase;
+        font-weight: 600;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+
+    /* ── Tablet ── */
+    @media (max-width: 768px) {
+        .auth-hero {
+            width: 90%;
+            padding: 0.2rem 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.9rem;
+        }
+        .auth-hero h2 {
+            font-size: 1.4rem;
+            white-space: normal;
+        }
+        .auth-hero p {
+            white-space: normal;
+            font-size: 0.78rem;
+        }
+        .auth-hero-badge {
+            white-space: nowrap;
+            flex-shrink: 0;
+            align-self: flex-end;
+            padding: 0.45rem 1.1rem;
+        }
+    }
+
+    /* ── Mobile ── */
+    @media (max-width: 480px) {
+        .auth-hero {
+            width: 100%;
+            padding: 1rem 1.1rem;
+            border-radius: 12px;
+            gap: 0.75rem;
+        }
+        .auth-hero h2 {
+            font-size: 1.25rem;
+        }
+        .auth-hero p {
+            font-size: 0.74rem;
+        }
+        .auth-hero-badge {
+            font-size: 0.68rem;
+            padding: 0.35rem 0.85rem;
+        }
+    }
+    </style>
+
+    <div class="auth-hero">
+        <div class="auth-hero-left">
             <div>
-                <h2 style="
-                    font-family:'Syne',sans-serif; font-size:1.7rem; font-weight:500;
-                    color:#fff; margin:0; line-height:1.1; letter-spacing:-0.3px;
-                ">Hey, Welcome to...</h2>
-                <p style="color:rgba(255,255,255,0.55); font-size:0.8rem; margin:0.25rem 0 0 0; line-height:1.4;">
-                    Sign in or create an account to classify news articles/headlines.
-                </p>
+                <h2>Hey, Welcome ...</h2>
+                <p>Sign in or create an account to classify news articles/headlines.</p>
             </div>
         </div>
-        <div style="
-            background:rgba(255,255,255,0.1);
-            border:1px solid rgba(255,255,255,0.2);
-            color:rgba(255,255,255,0.85);
-            border-radius:30px; font-size:0.75rem;
-            padding:0.45rem 1.1rem;
-            letter-spacing:0.8px; text-transform:uppercase;
-            font-weight:600; white-space:nowrap; flex-shrink:0;
-        ">⚡ Fake News Detector</div>
+        <div class="auth-hero-badge">⚡ Fake News Detector</div>
     </div>
     """, unsafe_allow_html=True)
 
