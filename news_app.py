@@ -181,7 +181,7 @@ html, body, [data-testid="stAppViewContainer"] { font-family: 'DM Sans', sans-se
         padding: 0.2rem 0.3rem;
         border-radius: 12px;
         gap: 0.75rem;
-        display: flex;
+        display: flex-start;
     }
     .hero h1 {
         font-size: 1rem;
@@ -190,6 +190,7 @@ html, body, [data-testid="stAppViewContainer"] { font-family: 'DM Sans', sans-se
     .hero-badge {
         font-size: 0.50rem;
         padding: 0.35rem 0.85rem;
+        display: flex-start;
     }
 }
 /* ── Section labels ── */
