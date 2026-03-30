@@ -178,13 +178,14 @@ html, body, [data-testid="stAppViewContainer"] { font-family: 'DM Sans', sans-se
 /* ── Mobile ── */
 @media (max-width: 480px) {
     .hero {
-        width: 100%;
-        padding: 1rem 1.1rem;
+        padding: 0.2rem 0.3rem;
         border-radius: 12px;
         gap: 0.75rem;
+        display: flex;
     }
     .hero h1 {
-        font-size: 1.2rem;
+        font-size: 1rem;
+        line-height: 0.8;
     }
     .hero-badge {
         font-size: 0.50rem;
