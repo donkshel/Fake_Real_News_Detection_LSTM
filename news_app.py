@@ -177,19 +177,19 @@ html, body, [data-testid="stAppViewContainer"] { font-family: 'DM Sans', sans-se
 }
 /* ── Mobile ── */
 @media (max-width: 480px) {
-.hero {
-    width: 100%;
-    padding: 1rem 1.1rem;
-    border-radius: 12px;
-    gap: 0.75rem;
-}
-.hero h1 {
-    font-size: 1.2rem;
-}
-.hero-badge {
-    font-size: 0.50rem;
-    padding: 0.35rem 0.85rem;
-}
+    .hero {
+        width: 100%;
+        padding: 1rem 1.1rem;
+        border-radius: 12px;
+        gap: 0.75rem;
+    }
+    .hero h1 {
+        font-size: 1.2rem;
+    }
+    .hero-badge {
+        font-size: 0.50rem;
+        padding: 0.35rem 0.85rem;
+    }
 }
 /* ── Section labels ── */
 .section-label {
