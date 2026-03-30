@@ -1,3 +1,4 @@
+#import necessary libraries
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -101,7 +102,7 @@ with st.sidebar:
         """, unsafe_allow_html=True)
 
 # ─────────────────────────────────────────────
-# Auth gate
+# Authentication gate
 # ─────────────────────────────────────────────
 if not is_logged_in():
     show_auth_page()
@@ -119,7 +120,7 @@ if st.session_state.get("show_admin") and is_admin():
     st.stop()
 
 # ─────────────────────────────────────────────
-# CUSTOM CSS
+# CSS STYLE
 # ─────────────────────────────────────────────
 st.markdown("""
 <style>
@@ -489,8 +490,8 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 st.divider()
-st.write("This app uses a Bidirectional LSTM model trained on the Kaggle Fake and True News Dataset."
-         " The model was trained to classify news articles as REAL or FAKE based on their text content."
+st.write("This app uses a Bidirectional LSTM model trained on the Kaggle Fake and True News and scraped kenyan news datasets."
+         " The model was trained to classify news articles as REAL, FAKE or UNCERTAIN based on their text content."
          " Use the sidebar 👈 to navigate between sections.")
 
 
@@ -531,7 +532,7 @@ if selected_page == "🔍  Detect":
         analyse_clicked = st.button("🔍  Analyse Article")
     with col_clear:
         def clear_form():
-            st.session_state.user_text = ""
+            st.session_state.user_text = ""  
             st.session_state.file_uploader_key += 1
         st.button("🗑  Clear Inputs", on_click=clear_form)
 

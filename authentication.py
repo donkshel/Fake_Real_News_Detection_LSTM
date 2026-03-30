@@ -50,7 +50,7 @@ def logout():
 # ─────────────────────────────────────────────
 def _get_logo_base64() -> str | None:
     """Read logo.png from the project root and return a base64 string."""
-    logo_path = os.path.join(os.path.dirname(__file__), "images/logo.png")
+    logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
     if not os.path.exists(logo_path):
         return None
     with open(logo_path, "rb") as f:
@@ -62,37 +62,41 @@ def _get_logo_base64() -> str | None:
 # AUTH PAGE  (login + register tabs)
 # ─────────────────────────────────────────────
 def show_auth_page():
-    """
-    Render the full authentication page.
-    Call this from news_app.py when the user is not logged in.
-    """
     st.markdown("""
     <div style="
         background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
         border-radius: 15px;
-        padding: 0.5rem;
+        padding: 0.2rem 1.2rem;
         margin-bottom: 0.5rem;
-        text-align: center;
         box-shadow: 0 8px 32px rgba(0,0,0,0.35);
-        height: fit-content;
-        width: 50%;
+        width: 60%;
         margin-left: auto;
         margin-right: auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
     ">
+        <div style="display:flex; align-items:center; gap:1rem;">
+            <div>
+                <h2 style="
+                    font-family:'Syne',sans-serif; font-size:1.7rem; font-weight:500;
+                    color:#fff; margin:0; line-height:1.1; letter-spacing:-0.3px;
+                ">Hey, Welcome to...</h2>
+                <p style="color:rgba(255,255,255,0.55); font-size:0.8rem; margin:0.25rem 0 0 0; line-height:1.4;">
+                    Sign in or create an account to classify news articles/headlines.
+                </p>
+            </div>
+        </div>
         <div style="
-            display:inline-block;background:rgba(255,255,255,0.1);
-            border:1px solid rgba(255,255,255,0.2);color:#c9c3f5;
-            border-radius:50px;font-size:.78rem;padding:4px 14px;
-            margin-bottom:1rem;letter-spacing:1.5px;text-transform:uppercase;
-            font-weight:700;
-        ">Fake News Detector</div>
-        <h2 style="
-            font-family:'Syne',sans-serif;font-size:1.8rem;font-weight:500;
-            color:#fff;margin:0 0 .1rem;letter-spacing:-.5px;
-        ">Hey, Welcome </h2>
-        <p style="color:#b0aed8;font-size:1.05rem;margin:0;line-height:1;">
-            Sign in or create an account to classify news articles/headlines.
-        </p>
+            background:rgba(255,255,255,0.1);
+            border:1px solid rgba(255,255,255,0.2);
+            color:rgba(255,255,255,0.85);
+            border-radius:30px; font-size:0.75rem;
+            padding:0.45rem 1.1rem;
+            letter-spacing:0.8px; text-transform:uppercase;
+            font-weight:600; white-space:nowrap; flex-shrink:0;
+        ">⚡ Fake News Detector</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -138,7 +142,7 @@ def show_auth_page():
         font-weight: 700 !important;
         font-size: 0.88rem !important;
         color: #6b6b9a !important;
-        background: transparent !important;
+        background: rgba(48,43,99,0.15) !important;
         border: none !important;
         transition: all 0.2s ease !important;
     }
@@ -155,6 +159,66 @@ def show_auth_page():
     div[data-testid="stTabs"] [data-baseweb="tab-border"] {
         display: none !important;
     }
+    /* ── Auth buttons — rotating green edge animation ── */
+
+/* Base button */
+div[data-testid="stVerticalBlock"] .stButton > button {
+    background: #ffffff !important;
+    color: #302b63 !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-family: 'Syne', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 1rem !important;
+    padding: 0.65rem 2rem !important;
+    position: relative !important;
+    z-index: 0 !important;
+    overflow: hidden !important;
+    transition: color 0.2s ease !important;
+}
+
+/* Rotating conic-gradient ring — sits behind the button */
+div[data-testid="stVerticalBlock"] .stButton > button::before {
+    content: '' !important;
+    position: absolute !important;
+    inset: -4px !important;
+    border-radius: 13px !important;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        #6c63ff 60deg,
+        #a78bfa 100deg,
+        #e879f9 140deg,
+        #38bdf8 200deg,
+        transparent 260deg
+    ) !important;
+    opacity: 0 !important;
+    animation: none !important;
+    transition: opacity 0.3s ease !important;
+    z-index: -2 !important;
+}
+
+/* Solid dark fill layer — covers the center so only the edge glows */
+div[data-testid="stVerticalBlock"] .stButton > button::after {
+    content: '' !important;
+    position: absolute !important;
+    inset: 2px !important;
+    background: #ffff !important;
+    border-radius: 9px !important;
+    z-index: -1 !important;
+}
+
+/* On hover — start the spin */
+div[data-testid="stVerticalBlock"] .stButton > button:hover::before {
+    opacity: 1 !important;
+    animation: border-spin 1s linear infinite !important;
+}
+
+/* Keyframe — full 360 rotation */
+@keyframes border-spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
     </style>
     """, unsafe_allow_html=True)
 
