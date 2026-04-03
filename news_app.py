@@ -175,24 +175,33 @@ html, body, [data-testid="stAppViewContainer"] { font-family: 'DM Sans', sans-se
     white-space: nowrap;
     flex-shrink: 0;
 }
-/* ── Mobile ── */
-@media (max-width: 480px) {
+
+/* ── Hero Mobile ── */
+@media (max-width: 768px) {
     .hero {
-        padding: 0.2rem 0.3rem;
-        border-radius: 12px;
-        gap: 0.75rem;
-        display: flex-start;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1rem 1.1rem;
+        gap: 0.7rem;
+    }
+    .hero-left {
+        align-items: center;
+    }
+    .hero-icon {
+        font-size: 1.9rem;
     }
     .hero h1 {
-        font-size: 1rem;
-        line-height: 0.8;
+        font-size: 1.35rem;
+        line-height: 1.2;
     }
     .hero-badge {
-        font-size: 0.50rem;
-        padding: 0.35rem 0.85rem;
-        display: flex-start;
+        align-self: flex-start;
+        white-space: normal;
+        font-size: 0.7rem;
+        padding: 0.35rem 0.9rem;
     }
 }
+
 /* ── Section labels ── */
 .section-label {
     font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700;
