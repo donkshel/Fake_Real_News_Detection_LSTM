@@ -389,8 +389,20 @@ def show_admin_page():
             }
 
             /* Remove subtitle on mobile to keep ONE clean line */
-            .sub {
-                display: none !important;
+           .sub {
+                display: block !important;
+                font-size: 0.65rem !important;
+                color: rgba(255,255,255,0.6) !important;
+                margin-top: 2px !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+            }
+            .left > div {
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                min-width: 0 !important;
             }
 
             /* Force title to stay in one line */
