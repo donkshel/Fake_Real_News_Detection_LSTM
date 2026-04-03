@@ -734,46 +734,12 @@ elif selected_page == "🕒  History":
     else:
         rows = get_user_history(u['id'], limit=50)
 
-        # ── Session state for checkboxes ──────────────────────────
+        # ── Session state ─────────────────────────────────────────
         if "hist_selected" not in st.session_state:
             st.session_state.hist_selected = set()
 
-        # Keep only IDs that still exist in the fetched rows
         valid_ids = {dict(r)["id"] for r in rows} if rows else set()
         st.session_state.hist_selected &= valid_ids
-
-        # ── Pre-sync checkboxes BEFORE computing n_sel ────────────
-        if rows:
-            hist_df_temp = pd.DataFrame([dict(r) for r in rows])
-            all_ids = set(hist_df_temp["id"].tolist())
-
-            current_select_all = st.session_state.get("hist_select_all", False)
-            prev_select_all    = st.session_state.get("hist_select_all_prev", False)
-
-            if current_select_all:
-                # Select All just ticked → force-select every row
-                st.session_state.hist_selected = all_ids.copy()
-                for rid in all_ids:
-                    st.session_state[f"hist_row_{rid}"] = True
-
-            elif not current_select_all and prev_select_all:
-                # Select All just UN-ticked → force-clear every row
-                st.session_state.hist_selected = set()
-                for rid in all_ids:
-                    st.session_state[f"hist_row_{rid}"] = False
-
-            else:
-                # Normal individual checkbox sync
-                for rid in all_ids:
-                    key = f"hist_row_{rid}"
-                    if key in st.session_state:
-                        if st.session_state[key]:
-                            st.session_state.hist_selected.add(rid)
-                        else:
-                            st.session_state.hist_selected.discard(rid)
-
-            # Remember current value for next rerun
-            st.session_state.hist_select_all_prev = current_select_all
 
         # ── Top action bar ────────────────────────────────────────
         col_info, col_del_sel, col_clear = st.columns([3, 1.4, 1.4])
@@ -784,21 +750,15 @@ elif selected_page == "🕒  History":
             del_label = f"🗑  Delete Selected ({n_sel})" if n_sel else "🗑  Delete Selected"
             if st.button(del_label, use_container_width=True, disabled=(n_sel == 0)):
                 delete_selected_history(u['id'], list(st.session_state.hist_selected))
-                for rid in list(st.session_state.hist_selected):
-                    st.session_state.pop(f"hist_row_{rid}", None)
                 st.session_state.hist_selected = set()
-                st.session_state.pop("hist_select_all", None)
-                st.session_state.pop("hist_select_all_prev", None)
+                st.session_state.pop("hist_multiselect", None)
                 st.success(f"Deleted {n_sel} record(s).")
                 st.rerun()
         with col_clear:
             if st.button("🗑  Clear All History", use_container_width=True):
                 clear_user_history(u['id'])
-                for rid in valid_ids:
-                    st.session_state.pop(f"hist_row_{rid}", None)
                 st.session_state.hist_selected = set()
-                st.session_state.pop("hist_select_all", None)
-                st.session_state.pop("hist_select_all_prev", None)
+                st.session_state.pop("hist_multiselect", None)
                 st.success("History cleared.")
                 st.rerun()
 
@@ -810,16 +770,34 @@ elif selected_page == "🕒  History":
             hist_df["fake_prob"]  = hist_df["fake_prob"].round(3)
             hist_df["input_text"] = hist_df["input_text"].str[:80] + "…"
 
-            # ── Select All checkbox ───────────────────────────────
-            all_ids    = set(hist_df["id"].tolist())
-            all_ticked = st.session_state.hist_selected == all_ids
-            st.checkbox(
-                "Select All",
-                value=all_ticked,
-                key="hist_select_all",
-            )
+            # ── Selection via multiselect ─────────────────────────
+            # NOTE: st.columns() cannot be wrapped in a scrollable HTML div in Streamlit's
+            # DOM — the div renders as a sibling, not a parent. The only reliable fix is
+            # a pure HTML table + multiselect for row selection.
+            all_ids = hist_df["id"].tolist()
+            preselected = [i for i in all_ids if i in st.session_state.hist_selected]
 
-            st.markdown("<br>", unsafe_allow_html=True)
+            sel_col, all_col = st.columns([4, 1])
+            with sel_col:
+                selected_ids = st.multiselect(
+                    "Select records to delete:",
+                    options=all_ids,
+                    default=preselected,
+                    format_func=lambda x: (
+                        f"#{x} · "
+                        f"{hist_df.loc[hist_df['id']==x, 'label'].values[0]} · "
+                        f"{str(hist_df.loc[hist_df['id']==x, 'classified_at'].values[0])[:10]}"
+                    ),
+                    placeholder="Choose records to delete…",
+                    label_visibility="collapsed",
+                    key="hist_multiselect",
+                )
+            with all_col:
+                if st.button("Select All", use_container_width=True):
+                    st.session_state.hist_selected = set(all_ids)
+                    st.rerun()
+
+            st.session_state.hist_selected = set(selected_ids)
 
             # ── Label colour helper ───────────────────────────────
             LABEL_STYLES = {
@@ -828,58 +806,49 @@ elif selected_page == "🕒  History":
                 "UNCERTAIN": ("background:#fff3cd;color:#856404;", "UNCERTAIN"),
             }
 
-            # ── Column headers ────────────────────────────────────
-            st.markdown('<div class="hist-table-scroll">', unsafe_allow_html=True)
-            hc0, hc1, hc2, hc3, hc4, hc5, hc6 = st.columns([0.4, 1.2, 0.8, 0.8, 0.7, 1.3, 3.6])
-            for col, label in zip(
-                [hc1, hc2, hc3, hc4, hc5, hc6],
-                ["Label", "Real %", "Fake %", "Words", "Classified At", "Article Preview"],
-            ):
-                col.markdown(
-                    f'<p style="font-size:0.78rem;font-weight:700;color:#888;'
-                    f'text-transform:uppercase;letter-spacing:0.8px;margin:0">{label}</p>',
-                    unsafe_allow_html=True,
-                )
-            st.markdown('<hr style="margin:4px 0 8px;border-color:#e2e5ec">', unsafe_allow_html=True)
+            # ── Build pure HTML table (the ONLY way to get horizontal scroll in Streamlit) ──
+            th = "padding:10px 12px;font-size:0.78rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.8px;text-align:left;white-space:nowrap;border-bottom:2px solid #e2e5ec;"
+            td_base = "padding:9px 12px;vertical-align:middle;border-bottom:1px solid #f0f0f0;"
 
-            # ── Rows ──────────────────────────────────────────────
+            table_rows = ""
             for _, row in hist_df.iterrows():
-                row_id     = row["id"]
-                is_checked = row_id in st.session_state.hist_selected
+                style, text = LABEL_STYLES.get(row["label"], ("", row["label"]))
+                classified_at = str(row["classified_at"])[:19]
+                is_selected = row["id"] in st.session_state.hist_selected
+                row_bg = "background:#f5f3ff;" if is_selected else ""
 
-                c0, c1, c2, c3, c4, c5, c6 = st.columns([0.4, 1.2, 0.8, 0.8, 0.7, 1.3, 3.6])
+                table_rows += f"""
+                <tr style="{row_bg}">
+                    <td style="{td_base}min-width:90px;">
+                        <span style="padding:3px 10px;border-radius:50px;font-size:0.78rem;font-weight:700;{style}">{text}</span>
+                    </td>
+                    <td style="{td_base}min-width:72px;font-size:0.88rem;color:#155724;font-weight:700;">{row["real_prob"]:.3f}</td>
+                    <td style="{td_base}min-width:72px;font-size:0.88rem;color:#721c24;font-weight:700;">{row["fake_prob"]:.3f}</td>
+                    <td style="{td_base}min-width:62px;font-size:0.88rem;">{row["word_count"]}</td>
+                    <td style="{td_base}min-width:165px;font-size:0.78rem;color:#666;white-space:nowrap;">{classified_at}</td>
+                    <td style="{td_base}min-width:220px;font-size:0.83rem;color:#333;">{row["input_text"]}</td>
+                </tr>"""
 
-                # Checkbox
-                with c0:
-                    st.checkbox(
-                        label=f"Select record {row_id}",
-                        value=is_checked,
-                        key=f"hist_row_{row_id}",
-                        label_visibility="collapsed",
-                    )
-
-                # Label badge
-                with c1:
-                    style, text = LABEL_STYLES.get(row["label"], ("", row["label"]))
-                    st.markdown(
-                        f'<span style="padding:3px 10px;border-radius:50px;font-size:0.78rem;'
-                        f'font-weight:700;{style}">{text}</span>',
-                        unsafe_allow_html=True,
-                    )
-
-                with c2:
-                    st.markdown(f'<p style="margin:0;font-size:0.88rem;color:#155724"><b>{row["real_prob"]:.3f}</b></p>', unsafe_allow_html=True)
-                with c3:
-                    st.markdown(f'<p style="margin:0;font-size:0.88rem;color:#721c24"><b>{row["fake_prob"]:.3f}</b></p>', unsafe_allow_html=True)
-                with c4:
-                    st.markdown(f'<p style="margin:0;font-size:0.88rem">{row["word_count"]}</p>', unsafe_allow_html=True)
-                with c5:
-                    st.markdown(f'<p style="margin:0;font-size:0.78rem;color:#666">{row["classified_at"]}</p>', unsafe_allow_html=True)
-                with c6:
-                    st.markdown(f'<p style="margin:0;font-size:0.83rem;color:#333">{row["input_text"]}</p>', unsafe_allow_html=True)
-
-                st.markdown('<hr style="margin:4px 0;border-color:#f0f0f0">', unsafe_allow_html=True)
-            st.markdown('</div>', unsafe_allow_html=True)
+            st.markdown(f"""
+            <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;
+                        border:1px solid #e2e5ec;border-radius:10px;margin-top:0.6rem;">
+                <table style="min-width:680px;width:100%;border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th style="{th}min-width:90px;">Label</th>
+                            <th style="{th}min-width:72px;">Real %</th>
+                            <th style="{th}min-width:72px;">Fake %</th>
+                            <th style="{th}min-width:62px;">Words</th>
+                            <th style="{th}min-width:165px;">Classified At</th>
+                            <th style="{th}min-width:220px;">Article Preview</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {table_rows}
+                    </tbody>
+                </table>
+            </div>
+            """, unsafe_allow_html=True)
 # ══════════════════════════════════════════════
 # PAGE 6 — SUPPORT CHAT
 # ══════════════════════════════════════════════
