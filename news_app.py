@@ -202,6 +202,23 @@ html, body, [data-testid="stAppViewContainer"] { font-family: 'DM Sans', sans-se
     }
 }
 
+/* ── History Table Mobile Scroll ── */
+@media (max-width: 768px) {
+    .hist-table-scroll {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border: 1px solid #e2e5ec;
+        border-radius: 8px;
+    }
+    .hist-table-scroll [data-testid="stHorizontalBlock"] {
+        flex-wrap: nowrap !important;
+        min-width: 640px;
+    }
+    .hist-table-scroll [data-testid="stColumn"] {
+        flex-shrink: 0 !important;
+    }
+}
+
 /* ── Section labels ── */
 .section-label {
     font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700;
@@ -812,6 +829,8 @@ elif selected_page == "🕒  History":
             }
 
             # ── Column headers ────────────────────────────────────
+            st.markdown('<div class="hist-table-scroll">', unsafe_allow_html=True)
+            
             hc0, hc1, hc2, hc3, hc4, hc5, hc6 = st.columns([0.4, 1.2, 0.8, 0.8, 0.7, 1.3, 3.6])
             for col, label in zip(
                 [hc1, hc2, hc3, hc4, hc5, hc6],
@@ -861,6 +880,7 @@ elif selected_page == "🕒  History":
                     st.markdown(f'<p style="margin:0;font-size:0.83rem;color:#333">{row["input_text"]}</p>', unsafe_allow_html=True)
 
                 st.markdown('<hr style="margin:4px 0;border-color:#f0f0f0">', unsafe_allow_html=True)
+            st.markdown('</div>', unsafe_allow_html=True)
 # ══════════════════════════════════════════════
 # PAGE 6 — SUPPORT CHAT
 # ══════════════════════════════════════════════
