@@ -708,7 +708,7 @@ elif selected_page == "📁  Dataset & Training":
 
 
 # ══════════════════════════════════════════════
-# PAGE 4 — HISTORY (CLEAN VERSION)
+# PAGE 4 — HISTORY PAGE   
 # ══════════════════════════════════════════════
 elif selected_page == "🕒  History":
     st.markdown("### 🕒 Classification History")
@@ -739,7 +739,7 @@ elif selected_page == "🕒  History":
             df_display = df.copy()
             df_display.insert(0, "Select", False)
 
-            # ── Editable Table (Selectable) ───────────────────────
+            # ──  Table (Selectable) ───────────────────────
             edited_df = st.data_editor(
                 df_display,
                 use_container_width=True,
