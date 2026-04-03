@@ -708,131 +708,77 @@ elif selected_page == "📁  Dataset & Training":
 
 
 # ══════════════════════════════════════════════
-# PAGE 4 — HISTORY
+# PAGE 4 — HISTORY (CLEAN VERSION)
 # ══════════════════════════════════════════════
 elif selected_page == "🕒  History":
-    st.markdown('<p class="section-label">Classification history</p>', unsafe_allow_html=True)
+    st.markdown("### 🕒 Classification History")
+
     u = current_user()
     if u is None:
         st.warning("You must be logged in to view history.")
     else:
         rows = get_user_history(u['id'], limit=50)
 
-        # ── Session state ─────────────────────────────────────────
-        if "hist_selected" not in st.session_state:
-            st.session_state.hist_selected = set()
-
-        valid_ids = {dict(r)["id"] for r in rows} if rows else set()
-        st.session_state.hist_selected &= valid_ids
-
-        # ── Top action bar ────────────────────────────────────────
-        col_info, col_del_sel, col_clear = st.columns([3, 1.4, 1.4])
-        with col_info:
-            st.write(f"Showing your last **{min(len(rows), 50)}** classification(s).")
-        with col_del_sel:
-            n_sel = len(st.session_state.hist_selected)
-            del_label = f"🗑  Delete Selected ({n_sel})" if n_sel else "🗑  Delete Selected"
-            if st.button(del_label, use_container_width=True, disabled=(n_sel == 0)):
-                delete_selected_history(u['id'], list(st.session_state.hist_selected))
-                st.session_state.hist_selected = set()
-                st.session_state.pop("hist_multiselect", None)
-                st.success(f"Deleted {n_sel} record(s).")
-                st.rerun()
-        with col_clear:
-            if st.button("🗑  Clear All History", use_container_width=True):
-                clear_user_history(u['id'])
-                st.session_state.hist_selected = set()
-                st.session_state.pop("hist_multiselect", None)
-                st.success("History cleared.")
-                st.rerun()
-
         if not rows:
-            st.info("No classifications yet. Go to **Detect** in the sidebar to analyse your first article.")
+            st.info("No classifications yet. Go to **Detect** to analyse your first article.")
         else:
-            hist_df = pd.DataFrame([dict(r) for r in rows])
-            hist_df["real_prob"]  = hist_df["real_prob"].round(3)
-            hist_df["fake_prob"]  = hist_df["fake_prob"].round(3)
-            hist_df["input_text"] = hist_df["input_text"].str[:80] + "…"
+            import pandas as pd
 
-            # ── Selection via multiselect ─────────────────────────
-            # NOTE: st.columns() cannot be wrapped in a scrollable HTML div in Streamlit's
-            # DOM — the div renders as a sibling, not a parent. The only reliable fix is
-            # a pure HTML table + multiselect for row selection.
-            all_ids = hist_df["id"].tolist()
-            preselected = [i for i in all_ids if i in st.session_state.hist_selected]
+            # ── Prepare Data ──────────────────────────────────────
+            df = pd.DataFrame([dict(r) for r in rows])
 
-            sel_col, all_col = st.columns([4, 1])
-            with sel_col:
-                selected_ids = st.multiselect(
-                    "Select records to delete:",
-                    options=all_ids,
-                    default=preselected,
-                    format_func=lambda x: (
-                        f"#{x} · "
-                        f"{hist_df.loc[hist_df['id']==x, 'label'].values[0]} · "
-                        f"{str(hist_df.loc[hist_df['id']==x, 'classified_at'].values[0])[:10]}"
-                    ),
-                    placeholder="Choose records to delete…",
-                    label_visibility="collapsed",
-                    key="hist_multiselect",
-                )
-            with all_col:
-                if st.button("Select All", use_container_width=True):
-                    st.session_state.hist_selected = set(all_ids)
+            df["real_prob"] = df["real_prob"].round(3)
+            df["fake_prob"] = df["fake_prob"].round(3)
+            df["classified_at"] = df["classified_at"].astype(str).str[:19]
+            df["input_text"] = df["input_text"].str[:80] + "…"
+
+            # Add selection column
+            if "selected_rows" not in st.session_state:
+                st.session_state.selected_rows = []
+
+            df_display = df.copy()
+            df_display.insert(0, "Select", False)
+
+            # ── Editable Table (Selectable) ───────────────────────
+            edited_df = st.data_editor(
+                df_display,
+                use_container_width=True,
+                hide_index=True,
+                column_config={
+                    "Select": st.column_config.CheckboxColumn(required=False),
+                    "id": st.column_config.TextColumn("ID"),
+                    "label": st.column_config.TextColumn("Label"),
+                    "real_prob": st.column_config.NumberColumn("Real %"),
+                    "fake_prob": st.column_config.NumberColumn("Fake %"),
+                    "word_count": st.column_config.NumberColumn("Words"),
+                    "classified_at": st.column_config.TextColumn("Date"),
+                    "input_text": st.column_config.TextColumn("Preview"),
+                },
+                disabled=[
+                    "id", "label", "real_prob", "fake_prob",
+                    "word_count", "classified_at", "input_text"
+                ],
+            )
+
+            # ── Get Selected Rows ─────────────────────────────────
+            selected_ids = edited_df[edited_df["Select"]]["id"].tolist()
+
+            # ── Action Buttons ────────────────────────────────────
+            col1, col2 = st.columns(2)
+
+            with col1:
+                if st.button(f"🗑 Delete Selected ({len(selected_ids)})",
+                             use_container_width=True,
+                             disabled=len(selected_ids) == 0):
+                    delete_selected_history(u['id'], selected_ids)
+                    st.success(f"Deleted {len(selected_ids)} record(s).")
                     st.rerun()
 
-            st.session_state.hist_selected = set(selected_ids)
-
-            # ── Label colour helper ───────────────────────────────
-            LABEL_STYLES = {
-                "REAL":      ("background:#d4edda;color:#155724;", "REAL"),
-                "FAKE":      ("background:#f8d7da;color:#721c24;", "FAKE"),
-                "UNCERTAIN": ("background:#fff3cd;color:#856404;", "UNCERTAIN"),
-            }
-
-            # ── Build pure HTML table (the ONLY way to get horizontal scroll in Streamlit) ──
-            th = "padding:10px 12px;font-size:0.78rem;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.8px;text-align:left;white-space:nowrap;border-bottom:2px solid #e2e5ec;"
-            td_base = "padding:9px 12px;vertical-align:middle;border-bottom:1px solid #f0f0f0;"
-
-            table_rows = ""
-            for _, row in hist_df.iterrows():
-                style, text = LABEL_STYLES.get(row["label"], ("", row["label"]))
-                classified_at = str(row["classified_at"])[:19]
-                is_selected = row["id"] in st.session_state.hist_selected
-                row_bg = "background:#f5f3ff;" if is_selected else ""
-
-                table_rows += f"""
-                <tr style="{row_bg}">
-                    <td style="{td_base}min-width:90px;">
-                        <span style="padding:3px 10px;border-radius:50px;font-size:0.78rem;font-weight:700;{style}">{text}</span>
-                    </td>
-                    <td style="{td_base}min-width:72px;font-size:0.88rem;color:#155724;font-weight:700;">{row["real_prob"]:.3f}</td>
-                    <td style="{td_base}min-width:72px;font-size:0.88rem;color:#721c24;font-weight:700;">{row["fake_prob"]:.3f}</td>
-                    <td style="{td_base}min-width:62px;font-size:0.88rem;">{row["word_count"]}</td>
-                    <td style="{td_base}min-width:165px;font-size:0.78rem;color:#666;white-space:nowrap;">{classified_at}</td>
-                    <td style="{td_base}min-width:220px;font-size:0.83rem;color:#333;">{row["input_text"]}</td>
-                </tr>"""
-
-            st.markdown(f"""
-            <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;
-                        border:1px solid #e2e5ec;border-radius:10px;margin-top:0.6rem;">
-                <table style="min-width:680px;width:100%;border-collapse:collapse;">
-                    <thead>
-                        <tr>
-                            <th style="{th}min-width:90px;">Label</th>
-                            <th style="{th}min-width:72px;">Real %</th>
-                            <th style="{th}min-width:72px;">Fake %</th>
-                            <th style="{th}min-width:62px;">Words</th>
-                            <th style="{th}min-width:165px;">Classified At</th>
-                            <th style="{th}min-width:220px;">Article Preview</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {table_rows}
-                    </tbody>
-                </table>
-            </div>
-            """, unsafe_allow_html=True)
+            with col2:
+                if st.button("🗑 Clear All History", use_container_width=True):
+                    clear_user_history(u['id'])
+                    st.success("History cleared.")
+                    st.rerun()
 # ══════════════════════════════════════════════
 # PAGE 6 — SUPPORT CHAT
 # ══════════════════════════════════════════════
