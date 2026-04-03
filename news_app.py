@@ -830,7 +830,6 @@ elif selected_page == "🕒  History":
 
             # ── Column headers ────────────────────────────────────
             st.markdown('<div class="hist-table-scroll">', unsafe_allow_html=True)
-            
             hc0, hc1, hc2, hc3, hc4, hc5, hc6 = st.columns([0.4, 1.2, 0.8, 0.8, 0.7, 1.3, 3.6])
             for col, label in zip(
                 [hc1, hc2, hc3, hc4, hc5, hc6],
