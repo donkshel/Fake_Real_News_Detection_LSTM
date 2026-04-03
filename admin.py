@@ -367,6 +367,53 @@ def show_admin_page():
             letter-spacing: 0.5px;
             white-space: nowrap;
         }
+        /* ═══════════════════════════════════════
+           MOBILE HERO FIX
+           ═══════════════════════════════════════ */
+        @media (max-width: 768px) {
+
+            .dash-hero {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                height: auto !important;
+                padding: 1rem 1.2rem !important;
+                gap: 6px !important;
+            }
+
+            /* Top row: icon + title */
+            .left {
+                width: 100% !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 0.6rem !important;
+            }
+
+            /* Remove subtitle on mobile to keep ONE clean line */
+            .sub {
+                display: none !important;
+            }
+
+            /* Force title to stay in one line */
+            .title {
+                font-size: 1.1rem !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+            }
+
+            /* Slightly reduce icon */
+            .shield {
+                font-size: 2rem !important;
+            }
+
+            /* Time goes below and right */
+            .badge {
+                align-self: flex-end !important;
+                font-size: 0.7rem !important;
+                padding: 0.35rem 0.8rem !important;
+                margin-top: 2px !important;
+            }
+        }
         </style>
         <div class="dash-hero">
             <div class="left">
