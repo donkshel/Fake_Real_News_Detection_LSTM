@@ -188,7 +188,7 @@ html, body, [data-testid="stAppViewContainer"] { font-family: 'DM Sans', sans-se
         align-items: center;
     }
     .hero-icon {
-        font-size: 179rem;
+        font-size: 1.7rem;
     }
     .hero h1 {
         font-size: 1.20rem;
