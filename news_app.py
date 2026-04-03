@@ -202,22 +202,6 @@ html, body, [data-testid="stAppViewContainer"] { font-family: 'DM Sans', sans-se
     }
 }
 
-/* ── History Table Mobile Scroll ── */
-@media (max-width: 768px) {
-    .hist-table-scroll {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        border: 1px solid #e2e5ec;
-        border-radius: 8px;
-    }
-    .hist-table-scroll [data-testid="stHorizontalBlock"] {
-        flex-wrap: nowrap !important;
-        min-width: 640px;
-    }
-    .hist-table-scroll [data-testid="stColumn"] {
-        flex-shrink: 0 !important;
-    }
-}
 
 /* ── Section labels ── */
 .section-label {
